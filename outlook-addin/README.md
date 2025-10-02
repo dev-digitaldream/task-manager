@@ -1,103 +1,87 @@
-# Outlook Add-in - Todo Collaboratif
+# Outlook Add-in - Task Manager
 
-Extension Outlook pour créer des tâches directement depuis vos emails.
+Microsoft Outlook extension to create tasks directly from emails.
 
-## 📋 Fonctionnalités
+## 📋 Features
 
-- ✅ Créer une tâche depuis n'importe quel email
-- ✅ Extraire automatiquement le sujet comme titre
-- ✅ Ajouter le corps de l'email comme commentaire
-- ✅ Assigner la tâche à un utilisateur
-- ✅ Définir priorité et date d'échéance
-- ✅ Publier sur le dashboard public
-- ✅ Interface native Outlook
+- ✅ Create tasks from any email
+- ✅ Auto-extract subject as task title
+- ✅ Add email body as comment
+- ✅ Assign to users
+- ✅ Set priority and due date
+- ✅ Publish to public dashboard
+- ✅ Native Outlook interface
 
-## 🚀 Déploiement
+## 🚀 Installation
 
-### 1. Héberger les fichiers
+### Prerequisites
 
-Les fichiers suivants doivent être accessibles via HTTPS sur `task-manager.digitaldream.work`:
+1. **Host the files** via HTTPS on `task-manager.digitaldream.work`
+2. **Create icons** (PNG: 16x16, 32x32, 64x64, 128x128)
+3. **Configure CORS** on server
 
-```
-/outlook/
-  ├── manifest.xml
-  ├── taskpane.html
-  ├── icon-16.png
-  ├── icon-32.png
-  ├── icon-64.png
-  ├── icon-80.png
-  └── icon-128.png
-```
+### Method 1: Outlook Web (Recommended for New Manifest)
 
-**Servir les fichiers depuis le serveur Node.js:**
+**⚠️ Important**: Microsoft now requires the **JSON manifest format** (Unified Manifest) for new add-ins.
+
+1. Open **Outlook on the web** (outlook.office.com)
+2. Click **Settings** (⚙️) → **View all Outlook settings**
+3. Go to **General → Manage add-ins**
+4. Click **+ Add a custom add-in**
+5. Select **Add from URL**
+6. Enter: `https://task-manager.digitaldream.work/outlook/manifest.json`
+7. Click **Install**
+
+### Method 2: Sideload for Testing (Desktop)
+
+**For development/testing only:**
+
+1. Download the manifest file locally
+2. Open Outlook Desktop
+3. Go to **File → Info → Manage Add-ins** (or **Get Add-ins**)
+4. Click **My add-ins** → **Add a custom add-in** → **Add from file**
+5. Select the downloaded `manifest.json`
+6. Accept the installation
+
+### Method 3: Centralized Deployment (Microsoft 365 Admin)
+
+**For organizations:**
+
+1. Sign in to **Microsoft 365 Admin Center**
+2. Go to **Settings → Integrated apps**
+3. Click **Upload custom apps**
+4. Select **Upload manifest file**
+5. Upload `manifest.json` (or `manifest.xml` for legacy support)
+6. Assign to users/groups
+
+## 📁 Manifest Files
+
+We provide **two manifest formats**:
+
+### 1. **manifest.json** (Unified Manifest - RECOMMENDED)
+- Modern JSON format
+- Required for new Outlook add-ins (2024+)
+- Better support for newer Outlook versions
+- Use this URL: `https://task-manager.digitaldream.work/outlook/manifest.json`
+
+### 2. **manifest.xml** (Legacy - For older Outlook)
+- Classic XML format
+- For older Outlook Desktop versions
+- May not work in newest Outlook Web
+- Use this URL: `https://task-manager.digitaldream.work/outlook/manifest.xml`
+
+**Microsoft's Transition**: Microsoft is phasing out XML manifests in favor of JSON Unified Manifests. If you can't install the XML version, use the JSON version.
+
+## 🔧 Server Configuration
+
+### 1. Serve Outlook Files
 
 ```javascript
-// Dans server/src/server.js
+// server/src/server.js
 app.use('/outlook', express.static(path.join(__dirname, '../../outlook-addin')));
 ```
 
-### 2. Créer les icônes
-
-Créer des icônes PNG aux formats requis (16x16, 32x32, 64x64, 80x80, 128x128).
-
-Icône recommandée: Logo Todo avec fond transparent.
-
-### 3. Installation dans Outlook
-
-#### Option A: Outlook Desktop (Windows/Mac)
-
-1. Ouvrir Outlook
-2. Aller dans **Fichier > Gérer les compléments** (ou **Get Add-ins**)
-3. Cliquer sur **Mes compléments**
-4. Cliquer sur **+ Ajouter un complément personnalisé**
-5. Sélectionner **Ajouter à partir d'un fichier**
-6. Parcourir et sélectionner `manifest.xml`
-7. Accepter l'installation
-
-#### Option B: Outlook Web (Office 365)
-
-1. Ouvrir Outlook sur le web (outlook.office.com)
-2. Cliquer sur **Paramètres** (⚙️) > **Afficher tous les paramètres Outlook**
-3. Aller dans **Général > Gérer les compléments**
-4. Cliquer sur **+ Ajouter un complément personnalisé**
-5. Sélectionner **Ajouter à partir d'une URL**
-6. Entrer: `https://task-manager.digitaldream.work/outlook/manifest.xml`
-7. Cliquer sur **Installer**
-
-#### Option C: Déploiement centralisé (Admin Microsoft 365)
-
-1. Se connecter au **Centre d'administration Microsoft 365**
-2. Aller dans **Paramètres > Compléments intégrés**
-3. Cliquer sur **Charger un complément personnalisé**
-4. Sélectionner **J'ai un fichier manifeste sur cet appareil**
-5. Télécharger `manifest.xml`
-6. Assigner aux utilisateurs/groupes souhaités
-
-### 4. Utilisation
-
-1. Ouvrir un email dans Outlook
-2. Cliquer sur l'onglet **Accueil** (Home)
-3. Chercher le bouton **Todo Collaboratif** dans le ruban
-4. Cliquer sur **Créer une tâche**
-5. Le panneau latéral s'ouvre avec:
-   - Titre pré-rempli (sujet de l'email)
-   - Expéditeur affiché
-   - Formulaire de création de tâche
-6. Compléter les champs et cliquer **Créer la tâche**
-
-## 🔧 Configuration
-
-### Variables d'environnement
-
-Le add-in communique avec l'API via:
-```
-https://task-manager.digitaldream.work/api/tasks
-https://task-manager.digitaldream.work/api/users
-```
-
-### CORS
-
-S'assurer que le serveur autorise les requêtes depuis Outlook:
+### 2. Configure CORS
 
 ```javascript
 // server/src/server.js
@@ -107,51 +91,111 @@ app.use(cors({
     'https://outlook.office365.com',
     'https://outlook.live.com',
     'https://task-manager.digitaldream.work'
-  ]
+  ],
+  credentials: true
 }));
 ```
 
-## 📱 Compatibilité
+### 3. Create Icons
 
-- ✅ Outlook Desktop (Windows)
-- ✅ Outlook Desktop (Mac)
-- ✅ Outlook Web App
-- ✅ Outlook Mobile (iOS/Android)
-- ✅ Office 365
+Create PNG icons at these sizes:
+- `icon-16.png` (16x16)
+- `icon-32.png` (32x32)
+- `icon-64.png` (64x64)
+- `icon-128.png` (128x128)
 
-## 🔒 Sécurité
+Place them in `/outlook-addin/` directory.
 
-- Utilise **HTTPS** obligatoire
-- Permissions: `ReadWriteMailbox` (lecture emails uniquement)
-- Aucune donnée email n'est stockée côté serveur
-- Communications API sécurisées
+## 💡 Usage
 
-## 🐛 Dépannage
+1. Open any email in Outlook
+2. Look for the **Task Manager** button in the ribbon (Home tab)
+3. Click **Create Task**
+4. Side panel opens with:
+   - Pre-filled title (email subject)
+   - Email sender displayed
+   - Task creation form
+5. Fill in the details and click **Create Task**
 
-### Le add-in n'apparaît pas
-- Vérifier que le manifest.xml est valide (validateur Microsoft)
-- S'assurer que tous les fichiers sont accessibles en HTTPS
-- Vider le cache d'Outlook et redémarrer
+## 🌐 API Endpoints Used
 
-### Erreur CORS
-- Vérifier la configuration CORS du serveur
-- S'assurer que `https://outlook.office.com` est autorisé
+The add-in communicates with:
+```
+GET  https://task-manager.digitaldream.work/api/users
+POST https://task-manager.digitaldream.work/api/tasks
+POST https://task-manager.digitaldream.work/api/tasks/:id/comments
+```
 
-### Les utilisateurs ne se chargent pas
-- Vérifier que `/api/users` est accessible
-- Ouvrir la console DevTools dans le taskpane (F12)
+## 📱 Compatibility
 
-## 📚 Ressources
+| Platform | JSON Manifest | XML Manifest |
+|----------|--------------|--------------|
+| Outlook Web (2024+) | ✅ Yes | ⚠️ Limited |
+| Outlook Desktop (Win) | ✅ Yes | ✅ Yes |
+| Outlook Desktop (Mac) | ✅ Yes | ✅ Yes |
+| Outlook Mobile | ✅ Yes | ⚠️ Limited |
+| Office 365 | ✅ Yes | ✅ Yes |
 
-- [Documentation Office Add-ins](https://docs.microsoft.com/en-us/office/dev/add-ins/)
-- [Outlook Add-ins API](https://docs.microsoft.com/en-us/office/dev/add-ins/reference/objectmodel/requirement-set-1.1/outlook-requirement-set-1.1)
-- [Manifest Schema](https://docs.microsoft.com/en-us/office/dev/add-ins/develop/add-in-manifests)
+**Note**: For maximum compatibility with modern Outlook, use the **JSON manifest**.
 
-## 📝 Notes de version
+## 🔒 Security
+
+- **HTTPS Required**: All connections must use HTTPS
+- **Permissions**: `MailboxItem.Read.User` (read email only)
+- **No storage**: Email content is not stored on the server
+- **Secure API**: All communications via HTTPS
+
+## 🐛 Troubleshooting
+
+### Add-in doesn't appear
+- Verify manifest is accessible via HTTPS
+- Check if using correct manifest format (JSON for new Outlook)
+- Clear Outlook cache and restart
+- Try the other manifest format
+
+### "Manifest not supported" error
+- You're trying to use XML manifest in new Outlook
+- Switch to `manifest.json` instead
+
+### CORS errors
+- Verify CORS configuration on server
+- Ensure `https://outlook.office.com` is allowed
+- Check browser console (F12) in taskpane
+
+### Users don't load
+- Check if `/api/users` endpoint is accessible
+- Open DevTools console in taskpane (F12)
+- Verify CORS headers
+
+## 📚 Resources
+
+- [Office Add-ins Documentation](https://docs.microsoft.com/office/dev/add-ins/)
+- [Unified Manifest (JSON)](https://docs.microsoft.com/office/dev/add-ins/develop/unified-manifest-overview)
+- [Outlook Add-ins API](https://docs.microsoft.com/office/dev/add-ins/outlook/)
+- [Manifest Validator](https://github.com/OfficeDev/office-addin-manifest)
+
+## 🔄 Migration from XML to JSON
+
+If you have the XML manifest installed and want to switch to JSON:
+
+1. **Uninstall the old add-in**:
+   - Outlook → Settings → Manage Add-ins
+   - Remove the XML version
+
+2. **Install the JSON version**:
+   - Follow "Method 1: Outlook Web" instructions above
+   - Use `manifest.json` URL
+
+## 📝 Version History
+
+### v1.1.0 (Current)
+- ✅ Added JSON Unified Manifest (manifest.json)
+- ✅ Modern Outlook compatibility
+- ✅ Improved ribbon integration
+- ✅ Updated icons and branding
 
 ### v1.0.0
-- Création de tâches depuis emails
-- Extraction automatique du sujet
-- Ajout du corps email en commentaire
-- Assignation et priorités
-- Support dashboard public
+- Initial release with XML manifest
+- Email-to-task creation
+- Auto-extract email details
+- User assignment and priorities

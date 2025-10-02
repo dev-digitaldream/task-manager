@@ -78,7 +78,7 @@ const LoginForm = ({ onLogin, darkMode, onToggleDarkMode }) => {
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 w-full max-w-md mx-4">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          {isLogin ? 'Connexion' : 'Créer un compte'}
+          {isLogin ? 'Login' : 'Sign Up'}
         </h2>
         <button
           onClick={onToggleDarkMode}
@@ -198,7 +198,7 @@ const LoginForm = ({ onLogin, darkMode, onToggleDarkMode }) => {
 
         <button
           type="submit"
-          disabled={isLoading || !formData.name.trim() || !formData.password}
+          disabled={isLoading || (useEmail ? (!formData.email.trim() || !formData.password) : !formData.name.trim())}
           className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-2 px-4 rounded-lg transition-colors"
         >
           {isLoading ? (
@@ -206,7 +206,7 @@ const LoginForm = ({ onLogin, darkMode, onToggleDarkMode }) => {
           ) : (
             <>
               {isLogin ? <LogIn size={20} /> : <UserPlus size={20} />}
-              {isLogin ? 'Se connecter' : 'Créer le compte'}
+              {isLogin ? 'Login' : 'Sign Up'}
             </>
           )}
         </button>

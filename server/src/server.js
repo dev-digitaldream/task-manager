@@ -76,6 +76,7 @@ app.use('/api/tasks', require('./routes/tasks'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/attachments', require('./routes/attachments'));
+app.use('/api/integrations', require('./routes/integrations'));
 app.use('/api', require('./routes/ical'));
 
 // Health check

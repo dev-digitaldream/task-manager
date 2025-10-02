@@ -1,0 +1,18 @@
+{
+  "extensionDescription": {
+    "message": "Create tasks from emails and sync with your Task Manager",
+    "description": "Description of the extension"
+  },
+  "browserActionTitle": {
+    "message": "Create Task from Email",
+    "description": "Title of the browser action button"
+  },
+  "createTaskTitle": {
+    "message": "Create Task",
+    "description": "Title for create task action"
+  },
+  "createTaskContextMenu": {
+    "message": "Create Task from this Email",
+    "description": "Context menu item text"
+  }
+}

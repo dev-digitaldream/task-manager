@@ -1,0 +1,18 @@
+{
+  "extensionDescription": {
+    "message": "Créez des tâches à partir d'emails et synchronisez avec votre gestionnaire de tâches",
+    "description": "Description de l'extension"
+  },
+  "browserActionTitle": {
+    "message": "Créer une tâche depuis l'email",
+    "description": "Titre du bouton d'action du navigateur"
+  },
+  "createTaskTitle": {
+    "message": "Créer une tâche",
+    "description": "Titre pour l'action de création de tâche"
+  },
+  "createTaskContextMenu": {
+    "message": "Créer une tâche depuis cet email",
+    "description": "Texte de l'élément du menu contextuel"
+  }
+}

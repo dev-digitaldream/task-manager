@@ -1,0 +1,140 @@
+{
+  "common": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "close": "Fermer",
+    "confirm": "Confirmer",
+    "loading": "Chargement...",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "all": "Tous",
+    "none": "Aucun"
+  },
+  "auth": {
+    "login": "Connexion",
+    "logout": "Déconnexion",
+    "email": "Email",
+    "password": "Mot de passe",
+    "signUp": "S'inscrire",
+    "forgotPassword": "Mot de passe oublié ?",
+    "selectUser": "Sélectionnez un utilisateur",
+    "demoMode": "Mode démo - Sélectionnez votre profil"
+  },
+  "tasks": {
+    "title": "Tâches",
+    "newTask": "Nouvelle tâche",
+    "editTask": "Modifier la tâche",
+    "deleteTask": "Supprimer la tâche",
+    "taskTitle": "Titre de la tâche",
+    "description": "Description",
+    "status": "Statut",
+    "priority": "Priorité",
+    "dueDate": "Date d'échéance",
+    "assignee": "Assigné à",
+    "assignTo": "Assigner à",
+    "unassigned": "Non assigné",
+    "comments": "Commentaires",
+    "addComment": "Ajouter un commentaire",
+    "attachments": "Pièces jointes",
+    "noTasks": "Aucune tâche",
+    "createFirst": "Créez votre première tâche",
+    "filterByStatus": "Filtrer par statut",
+    "filterByPriority": "Filtrer par priorité",
+    "filterByAssignee": "Filtrer par assigné",
+    "sortBy": "Trier par"
+  },
+  "status": {
+    "todo": "À faire",
+    "doing": "En cours",
+    "done": "Terminé",
+    "all": "Tous les statuts"
+  },
+  "priority": {
+    "low": "Basse",
+    "medium": "Moyenne",
+    "high": "Haute",
+    "urgent": "Urgente",
+    "all": "Toutes les priorités"
+  },
+  "profile": {
+    "title": "Profil",
+    "settings": "Paramètres",
+    "preferences": "Préférences",
+    "language": "Langue",
+    "theme": "Thème",
+    "notifications": "Notifications",
+    "notifyOnAssign": "Notifier lors de l'assignation",
+    "notifyOnComplete": "Notifier lors de la complétion",
+    "notifyOnComment": "Notifier pour les nouveaux commentaires",
+    "emailNotifications": "Notifications par email"
+  },
+  "theme": {
+    "light": "Clair",
+    "dark": "Sombre",
+    "system": "Système"
+  },
+  "calendar": {
+    "export": "Exporter le calendrier",
+    "subscribe": "S'abonner au calendrier",
+    "downloadICS": "Télécharger le fichier .ics",
+    "subscribeURL": "URL d'abonnement au calendrier",
+    "copyURL": "Copier l'URL",
+    "urlCopied": "URL copiée dans le presse-papiers",
+    "instructions": "Utilisez cette URL dans votre application de calendrier (Google Calendar, Outlook, Apple Calendar...)",
+    "myTasks": "Mes tâches",
+    "allTasks": "Toutes les tâches"
+  },
+  "integrations": {
+    "title": "Intégrations",
+    "ticketing": "Systèmes de ticketing",
+    "email": "Clients email",
+    "calendar": "Calendrier",
+    "configure": "Configurer",
+    "connected": "Connecté",
+    "disconnected": "Déconnecté",
+    "connect": "Connecter",
+    "disconnect": "Déconnecter"
+  },
+  "ticketing": {
+    "title": "Intégration ticketing",
+    "provider": "Fournisseur",
+    "apiUrl": "URL de l'API",
+    "apiKey": "Clé API",
+    "syncEnabled": "Activer la synchronisation",
+    "syncInterval": "Intervalle de sync (minutes)",
+    "lastSync": "Dernière sync",
+    "testConnection": "Tester la connexion",
+    "connectionSuccess": "Connexion réussie",
+    "connectionFailed": "Échec de la connexion"
+  },
+  "meeting": {
+    "title": "Mode réunion",
+    "criticalTasks": "Tâches critiques",
+    "inProgress": "En cours",
+    "blocked": "Bloqué",
+    "urgent": "Urgent",
+    "overdue": "En retard"
+  },
+  "analytics": {
+    "title": "Statistiques",
+    "overview": "Vue d'ensemble",
+    "completionRate": "Taux de complétion",
+    "avgCompletionTime": "Temps moyen de complétion",
+    "totalTasks": "Total des tâches",
+    "activeTasks": "Tâches actives",
+    "completedTasks": "Tâches terminées",
+    "tasksByStatus": "Tâches par statut",
+    "tasksByPriority": "Tâches par priorité",
+    "tasksByUser": "Tâches par utilisateur",
+    "performance": "Performance"
+  },
+  "errors": {
+    "generic": "Une erreur est survenue",
+    "notFound": "Non trouvé",
+    "unauthorized": "Non autorisé",
+    "networkError": "Erreur réseau",
+    "tryAgain": "Veuillez réessayer"
+  }
+}

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Task from Email</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1 id="headerTitle">Create Task from Email</h1>
+      <div class="language-selector">
+        <select id="languageSelect">
+          <option value="en">English</option>
+          <option value="fr">Français</option>
+          <option value="nl">Nederlands</option>
+        </select>
+      </div>
+    </header>
+
+    <div id="loadingMessage" class="loading">
+      <div class="spinner"></div>
+      <p id="loadingText">Loading email...</p>
+    </div>
+
+    <div id="errorMessage" class="error hidden">
+      <p id="errorText"></p>
+    </div>
+
+    <div id="successMessage" class="success hidden">
+      <p id="successText">Task created successfully!</p>
+    </div>
+
+    <form id="taskForm" class="hidden">
+      <div class="form-group">
+        <label for="serverUrl" id="labelServerUrl">Server URL</label>
+        <input
+          type="url"
+          id="serverUrl"
+          placeholder="https://task-manager.digitaldream.work"
+          required
+        >
+        <small id="serverUrlHelp" class="help-text">Configure your Task Manager server URL</small>
+      </div>
+
+      <div class="form-group">
+        <label for="taskTitle" id="labelTaskTitle">Task Title</label>
+        <input
+          type="text"
+          id="taskTitle"
+          placeholder="Enter task title"
+          required
+          maxlength="200"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="emailFrom" id="labelEmailFrom">From</label>
+        <input
+          type="text"
+          id="emailFrom"
+          readonly
+          class="readonly-field"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="dueDate" id="labelDueDate">Due Date</label>
+        <input
+          type="date"
+          id="dueDate"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="priority" id="labelPriority">Priority</label>
+        <select id="priority">
+          <option value="low" id="priorityLow">Low</option>
+          <option value="medium" id="priorityMedium" selected>Medium</option>
+          <option value="high" id="priorityHigh">High</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="assignee" id="labelAssignee">Assign To</label>
+        <select id="assignee">
+          <option value="" id="assigneeNone">No one (unassigned)</option>
+        </select>
+        <small id="assigneeHelp" class="help-text">Loading users...</small>
+      </div>
+
+      <div class="form-group">
+        <label for="status" id="labelStatus">Status</label>
+        <select id="status">
+          <option value="todo" id="statusTodo">To Do</option>
+          <option value="doing" id="statusDoing">Doing</option>
+          <option value="done" id="statusDone">Done</option>
+        </select>
+      </div>
+
+      <div class="form-group checkbox-group">
+        <label>
+          <input type="checkbox" id="includeEmailBody" checked>
+          <span id="labelIncludeBody">Include email body as first comment</span>
+        </label>
+      </div>
+
+      <div class="button-group">
+        <button type="submit" id="submitButton" class="btn btn-primary">
+          Create Task
+        </button>
+        <button type="button" id="cancelButton" class="btn btn-secondary">
+          Cancel
+        </button>
+      </div>
+    </form>
+
+    <div id="emailPreview" class="email-preview hidden">
+      <h3 id="previewTitle">Email Preview</h3>
+      <div id="previewContent"></div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

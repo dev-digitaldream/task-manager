@@ -1,0 +1,140 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "confirm": "Confirm",
+    "loading": "Loading...",
+    "search": "Search",
+    "filter": "Filter",
+    "all": "All",
+    "none": "None"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "signUp": "Sign up",
+    "forgotPassword": "Forgot password?",
+    "selectUser": "Select a user",
+    "demoMode": "Demo mode - Select your profile"
+  },
+  "tasks": {
+    "title": "Tasks",
+    "newTask": "New task",
+    "editTask": "Edit task",
+    "deleteTask": "Delete task",
+    "taskTitle": "Task title",
+    "description": "Description",
+    "status": "Status",
+    "priority": "Priority",
+    "dueDate": "Due date",
+    "assignee": "Assignee",
+    "assignTo": "Assign to",
+    "unassigned": "Unassigned",
+    "comments": "Comments",
+    "addComment": "Add a comment",
+    "attachments": "Attachments",
+    "noTasks": "No tasks yet",
+    "createFirst": "Create your first task",
+    "filterByStatus": "Filter by status",
+    "filterByPriority": "Filter by priority",
+    "filterByAssignee": "Filter by assignee",
+    "sortBy": "Sort by"
+  },
+  "status": {
+    "todo": "To do",
+    "doing": "In progress",
+    "done": "Done",
+    "all": "All statuses"
+  },
+  "priority": {
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "urgent": "Urgent",
+    "all": "All priorities"
+  },
+  "profile": {
+    "title": "Profile",
+    "settings": "Settings",
+    "preferences": "Preferences",
+    "language": "Language",
+    "theme": "Theme",
+    "notifications": "Notifications",
+    "notifyOnAssign": "Notify when assigned",
+    "notifyOnComplete": "Notify when completed",
+    "notifyOnComment": "Notify on new comment",
+    "emailNotifications": "Email notifications"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "calendar": {
+    "export": "Export calendar",
+    "subscribe": "Subscribe to calendar",
+    "downloadICS": "Download .ics file",
+    "subscribeURL": "Calendar subscription URL",
+    "copyURL": "Copy URL",
+    "urlCopied": "URL copied to clipboard",
+    "instructions": "Use this URL in your calendar app (Google Calendar, Outlook, Apple Calendar...)",
+    "myTasks": "My tasks",
+    "allTasks": "All tasks"
+  },
+  "integrations": {
+    "title": "Integrations",
+    "ticketing": "Ticketing systems",
+    "email": "Email clients",
+    "calendar": "Calendar",
+    "configure": "Configure",
+    "connected": "Connected",
+    "disconnected": "Disconnected",
+    "connect": "Connect",
+    "disconnect": "Disconnect"
+  },
+  "ticketing": {
+    "title": "Ticketing integration",
+    "provider": "Provider",
+    "apiUrl": "API URL",
+    "apiKey": "API Key",
+    "syncEnabled": "Enable synchronization",
+    "syncInterval": "Sync interval (minutes)",
+    "lastSync": "Last sync",
+    "testConnection": "Test connection",
+    "connectionSuccess": "Connection successful",
+    "connectionFailed": "Connection failed"
+  },
+  "meeting": {
+    "title": "Meeting mode",
+    "criticalTasks": "Critical tasks",
+    "inProgress": "In progress",
+    "blocked": "Blocked",
+    "urgent": "Urgent",
+    "overdue": "Overdue"
+  },
+  "analytics": {
+    "title": "Analytics",
+    "overview": "Overview",
+    "completionRate": "Completion rate",
+    "avgCompletionTime": "Average completion time",
+    "totalTasks": "Total tasks",
+    "activeTasks": "Active tasks",
+    "completedTasks": "Completed tasks",
+    "tasksByStatus": "Tasks by status",
+    "tasksByPriority": "Tasks by priority",
+    "tasksByUser": "Tasks by user",
+    "performance": "Performance"
+  },
+  "errors": {
+    "generic": "An error occurred",
+    "notFound": "Not found",
+    "unauthorized": "Unauthorized",
+    "networkError": "Network error",
+    "tryAgain": "Please try again"
+  }
+}

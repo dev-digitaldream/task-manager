@@ -1,0 +1,18 @@
+{
+  "extensionDescription": {
+    "message": "Maak taken van e-mails en synchroniseer met uw taakbeheerder",
+    "description": "Beschrijving van de extensie"
+  },
+  "browserActionTitle": {
+    "message": "Taak aanmaken vanuit e-mail",
+    "description": "Titel van de browseractieknop"
+  },
+  "createTaskTitle": {
+    "message": "Taak aanmaken",
+    "description": "Titel voor taak aanmaken actie"
+  },
+  "createTaskContextMenu": {
+    "message": "Taak aanmaken vanuit deze e-mail",
+    "description": "Contextmenu-itemtekst"
+  }
+}

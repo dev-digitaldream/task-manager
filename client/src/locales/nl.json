@@ -1,0 +1,140 @@
+{
+  "common": {
+    "save": "Opslaan",
+    "cancel": "Annuleren",
+    "delete": "Verwijderen",
+    "edit": "Bewerken",
+    "close": "Sluiten",
+    "confirm": "Bevestigen",
+    "loading": "Laden...",
+    "search": "Zoeken",
+    "filter": "Filteren",
+    "all": "Alle",
+    "none": "Geen"
+  },
+  "auth": {
+    "login": "Inloggen",
+    "logout": "Uitloggen",
+    "email": "E-mail",
+    "password": "Wachtwoord",
+    "signUp": "Registreren",
+    "forgotPassword": "Wachtwoord vergeten?",
+    "selectUser": "Selecteer een gebruiker",
+    "demoMode": "Demo modus - Selecteer uw profiel"
+  },
+  "tasks": {
+    "title": "Taken",
+    "newTask": "Nieuwe taak",
+    "editTask": "Taak bewerken",
+    "deleteTask": "Taak verwijderen",
+    "taskTitle": "Taaknaam",
+    "description": "Beschrijving",
+    "status": "Status",
+    "priority": "Prioriteit",
+    "dueDate": "Einddatum",
+    "assignee": "Toegewezen aan",
+    "assignTo": "Toewijzen aan",
+    "unassigned": "Niet toegewezen",
+    "comments": "Opmerkingen",
+    "addComment": "Opmerking toevoegen",
+    "attachments": "Bijlagen",
+    "noTasks": "Geen taken",
+    "createFirst": "Maak uw eerste taak",
+    "filterByStatus": "Filteren op status",
+    "filterByPriority": "Filteren op prioriteit",
+    "filterByAssignee": "Filteren op toegewezen",
+    "sortBy": "Sorteren op"
+  },
+  "status": {
+    "todo": "Te doen",
+    "doing": "Bezig",
+    "done": "Klaar",
+    "all": "Alle statussen"
+  },
+  "priority": {
+    "low": "Laag",
+    "medium": "Gemiddeld",
+    "high": "Hoog",
+    "urgent": "Urgent",
+    "all": "Alle prioriteiten"
+  },
+  "profile": {
+    "title": "Profiel",
+    "settings": "Instellingen",
+    "preferences": "Voorkeuren",
+    "language": "Taal",
+    "theme": "Thema",
+    "notifications": "Meldingen",
+    "notifyOnAssign": "Melden bij toewijzing",
+    "notifyOnComplete": "Melden bij voltooiing",
+    "notifyOnComment": "Melden bij nieuwe opmerking",
+    "emailNotifications": "E-mailmeldingen"
+  },
+  "theme": {
+    "light": "Licht",
+    "dark": "Donker",
+    "system": "Systeem"
+  },
+  "calendar": {
+    "export": "Kalender exporteren",
+    "subscribe": "Abonneren op kalender",
+    "downloadICS": ".ics bestand downloaden",
+    "subscribeURL": "Kalender abonnement URL",
+    "copyURL": "URL kopiëren",
+    "urlCopied": "URL gekopieerd naar klembord",
+    "instructions": "Gebruik deze URL in uw kalender app (Google Calendar, Outlook, Apple Calendar...)",
+    "myTasks": "Mijn taken",
+    "allTasks": "Alle taken"
+  },
+  "integrations": {
+    "title": "Integraties",
+    "ticketing": "Ticketing systemen",
+    "email": "E-mailclients",
+    "calendar": "Kalender",
+    "configure": "Configureren",
+    "connected": "Verbonden",
+    "disconnected": "Niet verbonden",
+    "connect": "Verbinden",
+    "disconnect": "Verbreken"
+  },
+  "ticketing": {
+    "title": "Ticketing integratie",
+    "provider": "Provider",
+    "apiUrl": "API URL",
+    "apiKey": "API-sleutel",
+    "syncEnabled": "Synchronisatie inschakelen",
+    "syncInterval": "Sync interval (minuten)",
+    "lastSync": "Laatste sync",
+    "testConnection": "Verbinding testen",
+    "connectionSuccess": "Verbinding geslaagd",
+    "connectionFailed": "Verbinding mislukt"
+  },
+  "meeting": {
+    "title": "Vergadermodus",
+    "criticalTasks": "Kritieke taken",
+    "inProgress": "Bezig",
+    "blocked": "Geblokkeerd",
+    "urgent": "Urgent",
+    "overdue": "Achterstallig"
+  },
+  "analytics": {
+    "title": "Statistieken",
+    "overview": "Overzicht",
+    "completionRate": "Voltooiingspercentage",
+    "avgCompletionTime": "Gemiddelde voltooiingstijd",
+    "totalTasks": "Totaal aantal taken",
+    "activeTasks": "Actieve taken",
+    "completedTasks": "Voltooide taken",
+    "tasksByStatus": "Taken per status",
+    "tasksByPriority": "Taken per prioriteit",
+    "tasksByUser": "Taken per gebruiker",
+    "performance": "Prestaties"
+  },
+  "errors": {
+    "generic": "Er is een fout opgetreden",
+    "notFound": "Niet gevonden",
+    "unauthorized": "Niet geautoriseerd",
+    "networkError": "Netwerkfout",
+    "tryAgain": "Probeer het opnieuw"
+  }
+}

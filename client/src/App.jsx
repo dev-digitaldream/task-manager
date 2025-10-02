@@ -1,12 +1,13 @@
 /**
  * Task Manager - Main Application
- * 
+ *
  * Professional collaborative task management with real-time sync
- * 
+ *
  * @copyright 2025 Digital Dream (www.digitaldream.work)
  * @license MIT
  */
 
+import './i18n'
 import React, { useState, useEffect } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { Moon, Sun, Users, Download, FileText, Calendar, Settings, LogOut, Circle, RefreshCw, CheckCircle, Shield, Bell } from 'lucide-react'

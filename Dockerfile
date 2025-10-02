@@ -1,5 +1,5 @@
 # Multi-stage build
-FROM node:18-alpine AS base
+FROM node:20-alpine AS base
 
 # Build client
 FROM base AS client-builder
@@ -18,7 +18,7 @@ COPY server/ ./
 RUN npx prisma generate
 
 # Production image
-FROM node:18-alpine AS production
+FROM node:20-alpine AS production
 WORKDIR /app
 
 # Install dumb-init and required libs (OpenSSL + glibc compat) for Prisma
@@ -37,25 +37,8 @@ COPY --from=client-builder --chown=nodejs:nodejs /app/client/dist ./server/publi
 # Create data directory for SQLite with proper permissions
 RUN mkdir -p /app/data && chown -R nodejs:nodejs /app/data
 
-# Create startup script
-COPY --chown=nodejs:nodejs <<EOF /app/start.sh
-#!/bin/sh
-set -e
-
-# Initialize database if not exists
-if [ ! -f /app/data/dev.db ]; then
-    echo "Initializing database..."
-    cd /app/server
-    npx prisma db push
-    node src/seed-demo.js
-fi
-
-# Start the application
-echo "Starting application..."
-cd /app/server
-exec node src/server.js
-EOF
-
+# Copy startup script
+COPY --chown=nodejs:nodejs start.sh /app/start.sh
 RUN chmod +x /app/start.sh
 
 USER nodejs

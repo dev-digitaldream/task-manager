@@ -16,7 +16,7 @@ Extension Outlook pour créer des tâches directement depuis vos emails.
 
 ### 1. Héberger les fichiers
 
-Les fichiers suivants doivent être accessibles via HTTPS sur `todo.rauwers.cloud`:
+Les fichiers suivants doivent être accessibles via HTTPS sur `task-manager.digitaldream.work`:
 
 ```
 /outlook/
@@ -61,7 +61,7 @@ Icône recommandée: Logo Todo avec fond transparent.
 3. Aller dans **Général > Gérer les compléments**
 4. Cliquer sur **+ Ajouter un complément personnalisé**
 5. Sélectionner **Ajouter à partir d'une URL**
-6. Entrer: `https://todo.rauwers.cloud/outlook/manifest.xml`
+6. Entrer: `https://task-manager.digitaldream.work/outlook/manifest.xml`
 7. Cliquer sur **Installer**
 
 #### Option C: Déploiement centralisé (Admin Microsoft 365)
@@ -91,8 +91,8 @@ Icône recommandée: Logo Todo avec fond transparent.
 
 Le add-in communique avec l'API via:
 ```
-https://todo.rauwers.cloud/api/tasks
-https://todo.rauwers.cloud/api/users
+https://task-manager.digitaldream.work/api/tasks
+https://task-manager.digitaldream.work/api/users
 ```
 
 ### CORS
@@ -106,7 +106,7 @@ app.use(cors({
     'https://outlook.office.com',
     'https://outlook.office365.com',
     'https://outlook.live.com',
-    'https://todo.rauwers.cloud'
+    'https://task-manager.digitaldream.work'
   ]
 }));
 ```

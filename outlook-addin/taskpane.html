@@ -262,7 +262,7 @@
 
         async function loadUsers() {
             try {
-                const response = await fetch('https://todo.rauwers.cloud/api/users');
+                const response = await fetch('https://task-manager.digitaldream.work/api/users');
                 users = await response.json();
 
                 const select = document.getElementById('assignee');
@@ -313,7 +313,7 @@
                 const notes = document.getElementById('notes').value;
                 const emailBody = currentEmail?.body;
 
-                const response = await fetch('https://todo.rauwers.cloud/api/tasks', {
+                const response = await fetch('https://task-manager.digitaldream.work/api/tasks', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -335,7 +335,7 @@
                     ].filter(Boolean).join('');
 
                     if (commentText && taskData.assigneeId) {
-                        await fetch(`https://todo.rauwers.cloud/api/tasks/${task.id}/comments`, {
+                        await fetch(`https://task-manager.digitaldream.work/api/tasks/${task.id}/comments`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'

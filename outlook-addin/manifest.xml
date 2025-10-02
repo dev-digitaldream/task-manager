@@ -13,13 +13,13 @@
   <DefaultLocale>fr-FR</DefaultLocale>
   <DisplayName DefaultValue="Todo Collaboratif"/>
   <Description DefaultValue="Créez des tâches directement depuis vos emails Outlook"/>
-  <IconUrl DefaultValue="https://todo.rauwers.cloud/outlook/icon-64.png"/>
-  <HighResolutionIconUrl DefaultValue="https://todo.rauwers.cloud/outlook/icon-128.png"/>
-  <SupportUrl DefaultValue="https://todo.rauwers.cloud/support"/>
+  <IconUrl DefaultValue="https://task-manager.digitaldream.work/outlook/icon-64.png"/>
+  <HighResolutionIconUrl DefaultValue="https://task-manager.digitaldream.work/outlook/icon-128.png"/>
+  <SupportUrl DefaultValue="https://task-manager.digitaldream.work/support"/>
 
   <!-- App Domains -->
   <AppDomains>
-    <AppDomain>https://todo.rauwers.cloud</AppDomain>
+    <AppDomain>https://task-manager.digitaldream.work</AppDomain>
   </AppDomains>
 
   <!-- Hosts -->
@@ -38,7 +38,7 @@
   <FormSettings>
     <Form xsi:type="ItemRead">
       <DesktopSettings>
-        <SourceLocation DefaultValue="https://todo.rauwers.cloud/outlook/taskpane.html"/>
+        <SourceLocation DefaultValue="https://task-manager.digitaldream.work/outlook/taskpane.html"/>
         <RequestedHeight>450</RequestedHeight>
       </DesktopSettings>
     </Form>
@@ -101,12 +101,12 @@
       <!-- Resources -->
       <Resources>
         <bt:Images>
-          <bt:Image id="Icon.16x16" DefaultValue="https://todo.rauwers.cloud/outlook/icon-16.png"/>
-          <bt:Image id="Icon.32x32" DefaultValue="https://todo.rauwers.cloud/outlook/icon-32.png"/>
-          <bt:Image id="Icon.80x80" DefaultValue="https://todo.rauwers.cloud/outlook/icon-80.png"/>
+          <bt:Image id="Icon.16x16" DefaultValue="https://task-manager.digitaldream.work/outlook/icon-16.png"/>
+          <bt:Image id="Icon.32x32" DefaultValue="https://task-manager.digitaldream.work/outlook/icon-32.png"/>
+          <bt:Image id="Icon.80x80" DefaultValue="https://task-manager.digitaldream.work/outlook/icon-80.png"/>
         </bt:Images>
         <bt:Urls>
-          <bt:Url id="Taskpane.Url" DefaultValue="https://todo.rauwers.cloud/outlook/taskpane.html"/>
+          <bt:Url id="Taskpane.Url" DefaultValue="https://task-manager.digitaldream.work/outlook/taskpane.html"/>
         </bt:Urls>
         <bt:ShortStrings>
           <bt:String id="GroupLabel" DefaultValue="Todo Collaboratif"/>

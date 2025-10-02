@@ -52,7 +52,7 @@ router.get('/users/:userId/tasks.ics', async (req, res) => {
     // Add tasks as VTODO items
     tasks.forEach(task => {
       const todo = calendar.createEvent({
-        uid: `task-${task.id}@todo.rauwers.cloud`,
+        uid: `task-${task.id}@task-manager.digitaldream.work`,
         summary: task.title,
         start: task.dueDate ? new Date(task.dueDate) : new Date(task.createdAt),
         created: new Date(task.createdAt),
@@ -101,7 +101,7 @@ router.get('/users/:userId/tasks.ics', async (req, res) => {
       }
 
       // Add URL to task
-      todo.url(`https://todo.rauwers.cloud/app#task-${task.id}`);
+      todo.url(`https://task-manager.digitaldream.work/app#task-${task.id}`);
     });
 
     // Set headers for iCalendar response

@@ -54,7 +54,7 @@ class NotificationService {
     if (!this.enabled || !assignee.email || !assignee.notifyOnAssign) return
 
     const mailOptions = {
-      from: process.env.EMAIL_FROM || 'noreply@todo.rauwers.cloud',
+      from: process.env.EMAIL_FROM || 'noreply@task-manager.digitaldream.work',
       to: assignee.email,
       subject: `Nouvelle tâche assignée: ${task.title}`,
       html: `
@@ -64,7 +64,7 @@ class NotificationService {
         <h3>${task.title}</h3>
         <p><strong>Priorité:</strong> ${task.priority || 'medium'}</p>
         ${task.dueDate ? `<p><strong>Date limite:</strong> ${new Date(task.dueDate).toLocaleDateString('fr-FR')}</p>` : ''}
-        <p><a href="${process.env.CLIENT_URL || 'https://todo.rauwers.cloud'}/app">Voir la tâche</a></p>
+        <p><a href="${process.env.CLIENT_URL || 'https://task-manager.digitaldream.work'}/app">Voir la tâche</a></p>
       `
     }
 
@@ -80,7 +80,7 @@ class NotificationService {
     if (!this.enabled || !owner.email || !owner.notifyOnComplete) return
 
     const mailOptions = {
-      from: process.env.EMAIL_FROM || 'noreply@todo.rauwers.cloud',
+      from: process.env.EMAIL_FROM || 'noreply@task-manager.digitaldream.work',
       to: owner.email,
       subject: `Tâche terminée: ${task.title}`,
       html: `
@@ -89,7 +89,7 @@ class NotificationService {
         <p>La tâche suivante a été marquée comme terminée:</p>
         <h3>${task.title}</h3>
         ${task.assignee ? `<p><strong>Par:</strong> ${task.assignee.name}</p>` : ''}
-        <p><a href="${process.env.CLIENT_URL || 'https://todo.rauwers.cloud'}/app">Voir les détails</a></p>
+        <p><a href="${process.env.CLIENT_URL || 'https://task-manager.digitaldream.work'}/app">Voir les détails</a></p>
       `
     }
 
@@ -108,7 +108,7 @@ class NotificationService {
       if (!recipient.email || !recipient.notifyOnComment) continue
 
       const mailOptions = {
-        from: process.env.EMAIL_FROM || 'noreply@todo.rauwers.cloud',
+        from: process.env.EMAIL_FROM || 'noreply@task-manager.digitaldream.work',
         to: recipient.email,
         subject: `Nouveau commentaire sur "${task.title}"`,
         html: `
@@ -119,7 +119,7 @@ class NotificationService {
           <blockquote style="border-left: 3px solid #cbd5e1; padding-left: 12px; margin: 16px 0;">
             ${comment.content}
           </blockquote>
-          <p><a href="${process.env.CLIENT_URL || 'https://todo.rauwers.cloud'}/app">Voir la tâche</a></p>
+          <p><a href="${process.env.CLIENT_URL || 'https://task-manager.digitaldream.work'}/app">Voir la tâche</a></p>
         `
       }
 
@@ -136,7 +136,7 @@ class NotificationService {
     if (!this.enabled || !assignee.email) return
 
     const mailOptions = {
-      from: process.env.EMAIL_FROM || 'noreply@kanban.app',
+      from: process.env.EMAIL_FROM || 'dev@digitaldream.work',
       to: assignee.email,
       subject: `Rappel: Échéance demain pour "${task.title}"`,
       html: `
@@ -146,7 +146,7 @@ class NotificationService {
         <h3>${task.title}</h3>
         <p><strong>Date limite:</strong> ${new Date(task.dueDate).toLocaleDateString('fr-FR')}</p>
         <p><strong>Statut actuel:</strong> ${task.status === 'todo' ? 'À faire' : task.status === 'doing' ? 'En cours' : 'Terminé'}</p>
-        <p><a href="${process.env.CLIENT_URL || 'http://localhost:5173'}/app">Voir la tâche</a></p>
+        <p><a href="${process.env.CLIENT_URL || 'https://task-manager.digitaldream.work'}/app">Voir la tâche</a></p>
       `
     }
 

@@ -26,6 +26,10 @@ const {
 } = require('./middleware/security');
 
 const app = express();
+
+// Trust proxy - Required for CapRover/reverse proxy
+app.set('trust proxy', 1);
+
 const server = http.createServer(app);
 const io = socketIo(server, {
   // Allow same-origin in production and any origin in development

@@ -10,24 +10,23 @@
 import './i18n'
 import React, { useState, useEffect } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { Moon, Sun, Users, Download, FileText, Calendar, Settings, LogOut, Circle, RefreshCw, CheckCircle, Shield, Bell } from 'lucide-react'
+import { Moon, Sun, Users, Download, FileText, Calendar, Settings, LogOut, Circle, RefreshCw, CheckCircle, Shield, Bell, X } from 'lucide-react'
 import TaskList from './components/TaskListClean'
 import Dashboard from './components/DashboardClean'
 import MeetingMode from './components/MeetingMode'
 import Analytics from './components/Analytics'
 import LoginForm from './components/LoginForm'
 import UserManagement from './components/UserManagement'
-import CalendarModal from './components/CalendarModal'
+import CalendarSubscription from './components/CalendarSubscription'
 import AdminPanel from './components/AdminPanel'
 import UserSettings from './components/UserSettings'
+import UserProfile from './components/UserProfile'
+import IntegrationsSettings from './components/IntegrationsSettings'
 import { useSocket } from './hooks/useSocket'
 import { useTasks } from './hooks/useTasks'
 import { useUsers } from './hooks/useUsers'
 
 function App() {
-  const [darkMode, setDarkMode] = useState(() => {
-    return localStorage.getItem('darkMode') === 'true'
-  })
   const [currentUser, setCurrentUser] = useState(() => {
     const saved = localStorage.getItem('currentUser')
     return saved ? JSON.parse(saved) : null
@@ -36,19 +35,11 @@ function App() {
   const [showCalendarModal, setShowCalendarModal] = useState(false)
   const [showAdminPanel, setShowAdminPanel] = useState(false)
   const [showUserSettings, setShowUserSettings] = useState(false)
+  const [showIntegrations, setShowIntegrations] = useState(false)
 
   const { socket } = useSocket(currentUser?.id)
   const { tasks, createTask, updateTask, deleteTask, addComment, setTaskVisibility } = useTasks(socket)
   const { users, onlineUsers } = useUsers(socket)
-
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
-    localStorage.setItem('darkMode', darkMode)
-  }, [darkMode])
 
   useEffect(() => {
     if (currentUser) {
@@ -89,10 +80,6 @@ function App() {
       setCurrentUser({ ...currentUser, isAdmin: updatedUser.isAdmin })
     }
   }, [users, currentUser])
-
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode)
-  }
 
   const exportData = async () => {
     try {
@@ -169,6 +156,36 @@ function App() {
   // Public dashboard: we no longer gate the whole app on login.
   const taskCounts = getTaskCounts()
 
+  // LoginPage with local dark mode management
+  const LoginPage = ({ onLogin }) => {
+    const [darkMode, setDarkMode] = useState(() => {
+      return localStorage.getItem('darkMode') === 'true'
+    })
+
+    useEffect(() => {
+      if (darkMode) {
+        document.documentElement.classList.add('dark')
+      } else {
+        document.documentElement.classList.remove('dark')
+      }
+      localStorage.setItem('darkMode', darkMode)
+    }, [darkMode])
+
+    const toggleDarkMode = () => {
+      setDarkMode(!darkMode)
+    }
+
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <LoginForm
+          onLogin={onLogin}
+          darkMode={darkMode}
+          onToggleDarkMode={toggleDarkMode}
+        />
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
       <Routes>
@@ -184,33 +201,31 @@ function App() {
         <Route path="/app" element={
           currentUser ? (
           <div className="container mx-auto px-4 py-6 max-w-4xl">
-            <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
+            <header className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-6">
                 <h1 className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
                   Task Manager
                 </h1>
-                
-                {/* Minimalist stats badges */}
+
+                {/* Stats badges */}
                 <div className="flex items-center gap-2">
-                  {/* Online users */}
                   <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
                     <Users size={14} className="text-gray-500 dark:text-gray-400" />
                     <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{onlineUsers.length}</span>
                   </div>
 
-                  {/* Task counts - minimalist dots with numbers */}
                   <div className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
                     <div className="flex items-center gap-1" title="To Do">
-                      <div className="w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-500"></div>
+                      <div className="w-2 h-2 rounded-full bg-gray-400"></div>
                       <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{taskCounts.todo}</span>
                     </div>
                     <div className="w-px h-3 bg-gray-300 dark:bg-gray-600"></div>
-                    <div className="flex items-center gap-1" title="In Progress">
+                    <div className="flex items-center gap-1" title="Doing">
                       <div className="w-2 h-2 rounded-full bg-blue-500"></div>
                       <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{taskCounts.doing}</span>
                     </div>
                     <div className="w-px h-3 bg-gray-300 dark:bg-gray-600"></div>
-                    <div className="flex items-center gap-1" title="Completed">
+                    <div className="flex items-center gap-1" title="Done">
                       <div className="w-2 h-2 rounded-full bg-green-500"></div>
                       <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{taskCounts.done}</span>
                     </div>
@@ -218,76 +233,16 @@ function App() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-1.5">
-
-                <button
-                  onClick={() => setShowCalendarModal(true)}
-                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                  title="Subscribe to calendar (iPhone/Outlook)"
-                >
+              <div className="flex items-center gap-2">
+                <button onClick={() => setShowCalendarModal(true)} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700" title="Calendar">
                   <Calendar size={20} className="text-gray-600 dark:text-gray-400" />
                 </button>
 
-                <button
-                  onClick={exportCSV}
-                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                  title="Export to CSV"
-                >
-                  <FileText size={20} className="text-gray-600 dark:text-gray-400" />
-                </button>
-
-                <button
-                  onClick={exportData}
-                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                  title="Export to JSON"
-                >
-                  <Download size={20} className="text-gray-600 dark:text-gray-400" />
-                </button>
-
-                <button
-                  onClick={() => setShowUserManagement(true)}
-                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                  title="User Management"
-                >
+                <button onClick={() => setShowIntegrations(true)} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700" title="Integrations">
                   <Settings size={20} className="text-gray-600 dark:text-gray-400" />
                 </button>
 
-                <button
-                  onClick={() => setShowUserSettings(true)}
-                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                  title="Notifications and Settings"
-                >
-                  <Bell size={20} className="text-gray-600 dark:text-gray-400" />
-                </button>
-
-                {currentUser?.isAdmin && (
-                  <button
-                    onClick={() => setShowAdminPanel(true)}
-                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                    title="Administration"
-                  >
-                    <Shield size={20} className="text-gray-600 dark:text-gray-400" />
-                  </button>
-                )}
-
-                <button
-                  onClick={toggleDarkMode}
-                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                >
-                  {darkMode ? (
-                    <Sun size={20} className="text-yellow-500" />
-                  ) : (
-                    <Moon size={20} className="text-gray-600" />
-                  )}
-                </button>
-
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                >
-                  <LogOut size={16} />
-                  Logout
-                </button>
+                <UserProfile user={currentUser} onUpdate={(updated) => setCurrentUser({...currentUser, ...updated})} />
               </div>
             </header>
 
@@ -334,13 +289,7 @@ function App() {
           currentUser ? (
             <Navigate to="/app" replace />
           ) : (
-            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-              <LoginForm 
-                onLogin={handleLogin}
-                darkMode={darkMode}
-                onToggleDarkMode={toggleDarkMode}
-              />
-            </div>
+            <LoginPage onLogin={handleLogin} />
           )
         } />
       </Routes>
@@ -353,7 +302,7 @@ function App() {
       )}
 
       {showCalendarModal && currentUser && (
-        <CalendarModal
+        <CalendarSubscription
           userId={currentUser.id}
           userName={currentUser.name}
           onClose={() => setShowCalendarModal(false)}
@@ -375,6 +324,22 @@ function App() {
             setCurrentUser({ ...currentUser, ...updatedUser })
           }}
         />
+      )}
+
+      {showIntegrations && currentUser && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Integrations</h2>
+                <button onClick={() => setShowIntegrations(false)} className="text-gray-500 hover:text-gray-700">
+                  <X size={24} />
+                </button>
+              </div>
+              <IntegrationsSettings userId={currentUser.id} onIntegrationChange={() => {}} />
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

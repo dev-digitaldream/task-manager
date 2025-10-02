@@ -47,7 +47,7 @@ if [ ! -f /app/data/dev.db ]; then
     echo "Initializing database..."
     cd /app/server
     npx prisma db push
-    npm run db:seed
+    node src/seed-demo.js
 fi
 
 # Start the application

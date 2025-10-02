@@ -5,7 +5,7 @@ FROM node:18-alpine AS base
 FROM base AS client-builder
 WORKDIR /app/client
 COPY client/package*.json ./
-RUN npm ci --only=production
+RUN npm ci
 COPY client/ ./
 RUN npm run build
 

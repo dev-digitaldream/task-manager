@@ -12,6 +12,7 @@ const apiLimiter = rateLimit({
   message: 'Too many requests from this IP, please try again later.',
   standardHeaders: true,
   legacyHeaders: false,
+  trustProxy: true, // Trust X-Forwarded-For from CapRover/reverse proxy
 });
 
 // Stricter rate limiting for auth endpoints
@@ -20,6 +21,7 @@ const authLimiter = rateLimit({
   max: 5, // 5 login attempts
   message: 'Too many login attempts, please try again later.',
   skipSuccessfulRequests: true,
+  trustProxy: true, // Trust X-Forwarded-For from CapRover/reverse proxy
 });
 
 // File upload rate limiting
@@ -27,6 +29,7 @@ const uploadLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 20, // 20 uploads per hour
   message: 'Too many file uploads, please try again later.',
+  trustProxy: true, // Trust X-Forwarded-For from CapRover/reverse proxy
 });
 
 // Helmet security headers

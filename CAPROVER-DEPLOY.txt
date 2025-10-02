@@ -1,0 +1,51 @@
+📦 TODO COLLABORATIF - DEPLOYMENT CAPROVER
+
+🚀 DÉPLOIEMENT RAPIDE  
+===================
+
+1. UPLOAD FICHIER
+   - Prendre: todo-collaboratif-caprover-fixed.tar.gz (166KB)
+   - CapRover Dashboard > Apps > Create New App
+   - Method: "Upload from Computer" 
+   - Upload le .tar.gz
+
+🔧 SI PROBLÈME DOCKER:
+   - Le captain-definition utilise Dockerfile.caprover
+   - Alternative: changer vers Dockerfile.simple dans captain-definition
+
+2. CONFIGURATION
+   - App Name: todo-collaboratif (ou votre nom)
+   - Port: 3001 (déjà configuré)
+   - Pas de variables d'env requises
+
+3. ACTIVATION
+   - Deploy > Wait for green checkmark
+   - Enable HTTPS si besoin
+   - App accessible sur: https://todo-collaboratif.votredomaine.com
+
+✅ COMPTES CRÉÉS
+================
+- Mohammed : Mohammed1$
+- Hicham   : Hicham1$  
+- Sophie   : Sophie1$
+- Rik      : Rik1$
+
+🔒 SÉCURISÉ
+===========
+- Aucune info de connexion exposée
+- Mots de passe hashés bcrypt
+- Base SQLite persistante automatique
+- Synchronisation temps réel
+
+📋 FEATURES
+===========
+✅ Authentification sécurisée
+✅ Gestion d'équipe illimitée
+✅ Dashboard temps réel
+✅ Mode sombre/clair
+✅ Export JSON
+✅ Mobile responsive
+✅ Comments système
+✅ Dates limites avec alertes
+
+That's it! 🎉

@@ -1,0 +1,20 @@
+node_modules
+npm-debug.log
+.git
+.gitignore
+README.md
+.env
+.nyc_output
+coverage
+.DS_Store
+*.log
+
+# Client build artifacts (we want to include dist)
+client/node_modules
+client/.vite
+client/dist/vite.svg
+
+# Server
+server/node_modules
+server/prisma/dev.db
+server/prisma/dev.db-journal

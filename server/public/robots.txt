@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /dashboard
+Disallow: /app
+
+# Allow assets and API
+Allow: /assets/
+Allow: /api/

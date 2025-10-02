@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Priority {
+  low
+  medium
+  high
+  urgent
+}
+
+enum ClientApproval {
+  none
+  pending
+  approved
+  rejected
+}
+model Task {
+  id          String    @id @default(cuid())
+  title       String
+  status      String    @default("todo") // todo, doing, done
+  dueDate     DateTime?
+  // Task can be assigned to someone (executor)
+  assigneeId  String?
+  assignee    User?     @relation("AssignedTasks", fields: [assigneeId], references: [id])
+
+  // Task has an owner (personal list owner). Only owner can toggle public visibility.
+  ownerId     String?
+  owner       User?     @relation("OwnedTasks", fields: [ownerId], references: [id])
+
+  // Public visibility control for dashboard
+  isPublic      Boolean   @default(false)
+  publicSummary String?
+
+  // Recurring tasks
+  isRecurring   Boolean   @default(false)
+  recurrenceRule String?  // RRULE format (RFC 5545)
+  parentTaskId  String?   // Link to parent recurring task
+  parentTask    Task?     @relation("RecurringTasks", fields: [parentTaskId], references: [id], onDelete: Cascade)
+  childTasks    Task[]    @relation("RecurringTasks")
+
+  comments    Comment[]
+  auditLogs   AuditLog[]
+  attachments Attachment[]
+  priority    Priority  @default(medium)
+  clientApproval ClientApproval @default(none)
+  approvalComment String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model User {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  password String?
+  avatar   String?
+  isOnline Boolean   @default(false)
+  isAdmin  Boolean   @default(false)
+  email    String?
+  notifyOnAssign   Boolean @default(true)
+  notifyOnComplete Boolean @default(true)
+  notifyOnComment  Boolean @default(true)
+  // Tasks this user owns (personal list)
+  ownedTasks    Task[]   @relation("OwnedTasks")
+  // Tasks assigned to this user (executor)
+  assignedTasks Task[]   @relation("AssignedTasks")
+  comments Comment[]
+  auditLogs AuditLog[]
+  attachments Attachment[]
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Attachment {
+  id          String   @id @default(cuid())
+  taskId      String
+  task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  uploaderId  String
+  uploader    User     @relation(fields: [uploaderId], references: [id])
+  fileName    String
+  fileType    String
+  fileSize    Int
+  url         String   // Cloudinary URL
+  publicId    String   // Cloudinary public_id for deletion
+  createdAt   DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String   // created, updated, deleted, status_changed, assigned, etc.
+  field     String?  // Field that changed (e.g., "status", "assignee")
+  oldValue  String?  // Previous value
+  newValue  String?  // New value
+  createdAt DateTime @default(now())
+}

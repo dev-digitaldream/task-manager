@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo Collaboratif - Créer une tâche</title>
+    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 16px;
+            background: #f8fafc;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 100%;
+        }
+
+        h2 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: #0f172a;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #475569;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            background: white;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .email-info {
+            background: #e0f2fe;
+            border: 1px solid #bae6fd;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 16px;
+            font-size: 13px;
+        }
+
+        .email-info strong {
+            color: #0369a1;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-primary {
+            background: #0f172a;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1e293b;
+        }
+
+        .btn-primary:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .success {
+            background: #d1fae5;
+            border: 1px solid #6ee7b7;
+            color: #065f46;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 16px;
+            display: none;
+        }
+
+        .error {
+            background: #fee2e2;
+            border: 1px solid #fca5a5;
+            color: #991b1b;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 16px;
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #64748b;
+        }
+
+        .spinner {
+            border: 3px solid #e2e8f0;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>📋 Créer une tâche</h2>
+
+        <div id="emailInfo" class="email-info">
+            <div><strong>De:</strong> <span id="emailFrom"></span></div>
+            <div><strong>Objet:</strong> <span id="emailSubject"></span></div>
+        </div>
+
+        <form id="taskForm">
+            <div class="form-group">
+                <label for="title">Titre de la tâche *</label>
+                <input type="text" id="title" required placeholder="Titre de la tâche...">
+            </div>
+
+            <div class="form-group">
+                <label for="priority">Priorité</label>
+                <select id="priority">
+                    <option value="low">Basse</option>
+                    <option value="medium" selected>Moyenne</option>
+                    <option value="high">Haute</option>
+                    <option value="urgent">Urgente</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="dueDate">Date d'échéance</label>
+                <input type="date" id="dueDate">
+            </div>
+
+            <div class="form-group">
+                <label for="assignee">Assigner à</label>
+                <select id="assignee">
+                    <option value="">Non assigné</option>
+                </select>
+            </div>
+
+            <div class="form-group checkbox-group">
+                <input type="checkbox" id="isPublic">
+                <label for="isPublic" style="margin-bottom: 0;">Rendre publique (dashboard)</label>
+            </div>
+
+            <div class="form-group">
+                <label for="notes">Notes (optionnel)</label>
+                <textarea id="notes" placeholder="Ajouter des notes..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+                Créer la tâche
+            </button>
+        </form>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <div>Création en cours...</div>
+        </div>
+
+        <div id="success" class="success"></div>
+        <div id="error" class="error"></div>
+    </div>
+
+    <script>
+        let currentEmail = null;
+        let users = [];
+
+        Office.onReady((info) => {
+            if (info.host === Office.HostType.Outlook) {
+                loadEmailData();
+                loadUsers();
+                setupForm();
+            }
+        });
+
+        function loadEmailData() {
+            const item = Office.context.mailbox.item;
+
+            // Get email data
+            item.from.getAsync((result) => {
+                if (result.status === Office.AsyncResultStatus.Succeeded) {
+                    const from = result.value;
+                    document.getElementById('emailFrom').textContent = from.displayName || from.emailAddress;
+                }
+            });
+
+            item.subject.getAsync((result) => {
+                if (result.status === Office.AsyncResultStatus.Succeeded) {
+                    const subject = result.value;
+                    document.getElementById('emailSubject').textContent = subject;
+                    document.getElementById('title').value = subject;
+                    currentEmail = {
+                        subject: subject,
+                        from: null,
+                        body: null
+                    };
+                }
+            });
+
+            // Get email body
+            item.body.getAsync('text', (result) => {
+                if (result.status === Office.AsyncResultStatus.Succeeded) {
+                    if (currentEmail) {
+                        currentEmail.body = result.value;
+                    }
+                }
+            });
+        }
+
+        async function loadUsers() {
+            try {
+                const response = await fetch('https://todo.rauwers.cloud/api/users');
+                users = await response.json();
+
+                const select = document.getElementById('assignee');
+                users.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.id;
+                    option.textContent = `${user.avatar} ${user.name}`;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Failed to load users:', error);
+            }
+        }
+
+        function setupForm() {
+            const form = document.getElementById('taskForm');
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await createTask();
+            });
+        }
+
+        async function createTask() {
+            const submitBtn = document.getElementById('submitBtn');
+            const loading = document.getElementById('loading');
+            const success = document.getElementById('success');
+            const error = document.getElementById('error');
+
+            // Hide messages
+            success.style.display = 'none';
+            error.style.display = 'none';
+
+            // Show loading
+            submitBtn.disabled = true;
+            loading.style.display = 'block';
+
+            try {
+                const taskData = {
+                    title: document.getElementById('title').value,
+                    priority: document.getElementById('priority').value,
+                    dueDate: document.getElementById('dueDate').value || null,
+                    assigneeId: document.getElementById('assignee').value || null,
+                    isPublic: document.getElementById('isPublic').checked,
+                    ownerId: document.getElementById('assignee').value || null,
+                };
+
+                // Add notes as first comment if provided
+                const notes = document.getElementById('notes').value;
+                const emailBody = currentEmail?.body;
+
+                const response = await fetch('https://todo.rauwers.cloud/api/tasks', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(taskData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erreur lors de la création de la tâche');
+                }
+
+                const task = await response.json();
+
+                // Add comment with notes and email excerpt
+                if (notes || emailBody) {
+                    const commentText = [
+                        notes ? `📝 Notes: ${notes}` : '',
+                        emailBody ? `\n\n📧 Email:\n${emailBody.substring(0, 500)}${emailBody.length > 500 ? '...' : ''}` : ''
+                    ].filter(Boolean).join('');
+
+                    if (commentText && taskData.assigneeId) {
+                        await fetch(`https://todo.rauwers.cloud/api/tasks/${task.id}/comments`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                content: commentText,
+                                authorId: taskData.assigneeId
+                            })
+                        });
+                    }
+                }
+
+                // Show success
+                loading.style.display = 'none';
+                success.textContent = '✅ Tâche créée avec succès!';
+                success.style.display = 'block';
+
+                // Reset form after 2 seconds
+                setTimeout(() => {
+                    form.reset();
+                    loadEmailData();
+                    success.style.display = 'none';
+                    submitBtn.disabled = false;
+                }, 2000);
+
+            } catch (err) {
+                loading.style.display = 'none';
+                error.textContent = '❌ ' + err.message;
+                error.style.display = 'block';
+                submitBtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

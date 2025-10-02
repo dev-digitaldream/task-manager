@@ -1,0 +1,22 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy server files
+COPY server/package*.json ./
+RUN npm ci --only=production
+
+# Copy all server files
+COPY server/ ./
+
+# Make sure start script is executable
+RUN chmod +x start-fixed.sh
+
+# Create data directory
+RUN mkdir -p /app/data
+
+# Expose port
+EXPOSE 3001
+
+# Start with the script
+CMD ["sh", "start-fixed.sh"]

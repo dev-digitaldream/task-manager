@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Rounded square background -->
+  <rect x="32" y="32" width="448" height="448" rx="96" ry="96" fill="#f3dfb2"/>
+  <!-- Circle outline -->
+  <circle cx="256" cy="256" r="150" fill="none" stroke="#111" stroke-width="36" stroke-linecap="round"/>
+  <!-- Check mark -->
+  <path d="M190 260l48 52 92-100" fill="none" stroke="#111" stroke-width="36" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

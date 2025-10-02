@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  todo-app:
+    build: .
+    container_name: collaborative-todo
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - CLIENT_URL=http://localhost:3001
+      - DATABASE_URL=file:/app/data/dev.db
+    volumes:
+      - todo_data:/app/data
+    restart: unless-stopped
+    networks:
+      - todo_network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) }).on('error', () => process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  todo_data:
+    driver: local
+
+networks:
+  todo_network:
+    driver: bridge

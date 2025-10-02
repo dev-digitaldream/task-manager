@@ -3,7 +3,9 @@ import { LogIn, UserPlus, Eye, EyeOff, Moon, Sun } from 'lucide-react'
 
 const LoginForm = ({ onLogin, darkMode, onToggleDarkMode }) => {
   const [isLogin, setIsLogin] = useState(true)
+  const [useEmail, setUseEmail] = useState(true) // Toggle between email and simple auth
   const [formData, setFormData] = useState({
+    email: '',
     name: '',
     password: '',
     avatar: '👤'
@@ -18,30 +20,46 @@ const LoginForm = ({ onLogin, darkMode, onToggleDarkMode }) => {
     e.preventDefault()
     setError('')
     
-    if (!formData.name.trim() || !formData.password) {
-      setError('Nom et mot de passe requis')
-      return
+    // Validation based on auth mode
+    if (useEmail) {
+      if (!formData.email.trim() || !formData.password) {
+        setError('Email and password required')
+        return
+      }
+      if (!isLogin && !formData.name.trim()) {
+        setError('Name required for registration')
+        return
+      }
+    } else {
+      if (!formData.name.trim()) {
+        setError('Name required')
+        return
+      }
     }
 
     setIsLoading(true)
 
     try {
       const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register'
+      const payload = useEmail 
+        ? { email: formData.email, password: formData.password, name: formData.name, avatar: formData.avatar }
+        : { name: formData.name, avatar: formData.avatar }
+      
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       })
 
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Erreur de connexion')
+        throw new Error(data.error || 'Login failed')
       }
 
-      onLogin(data.user)
+      onLogin(data.user || data)
     } catch (error) {
       setError(error.message)
     } finally {
@@ -74,36 +92,68 @@ const LoginForm = ({ onLogin, darkMode, onToggleDarkMode }) => {
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Nom d'utilisateur
-          </label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-            placeholder="Entrez votre nom"
-            disabled={isLoading}
-          />
+      {/* Demo Credentials Info */}
+      {useEmail && (
+        <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+          <p className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">Demo Credentials:</p>
+          <div className="text-xs text-blue-700 dark:text-blue-300 space-y-1">
+            <p>📧 demo@digitaldream.work</p>
+            <p>🔑 Demo2024!</p>
+            <p className="mt-2 pt-2 border-t border-blue-200 dark:border-blue-700">Admin: admin@digitaldream.work / Admin2024!</p>
+          </div>
         </div>
+      )}
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Mot de passe
-          </label>
-          <div className="relative">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {useEmail && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Email
+            </label>
             <input
-              type={showPassword ? 'text' : 'password'}
-              name="password"
-              value={formData.password}
+              type="email"
+              name="email"
+              value={formData.email}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              placeholder="Entrez votre mot de passe"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              placeholder="your@email.com"
               disabled={isLoading}
             />
+          </div>
+        )}
+
+        {(!useEmail || !isLogin) && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Name
+            </label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              placeholder="Your name"
+              disabled={isLoading}
+            />
+          </div>
+        )}
+
+        {useEmail && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Password
+            </label>
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                placeholder="Your password"
+                disabled={isLoading}
+              />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}

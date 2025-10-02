@@ -1,80 +1,85 @@
 const express = require('express');
-const bcrypt = require('bcryptjs');
-const { PrismaClient } = require('@prisma/client');
-
 const router = express.Router();
+const { PrismaClient } = require('@prisma/client');
+const bcrypt = require('bcryptjs');
 const prisma = new PrismaClient();
 
-// POST /api/auth/login
+// Login with email/password OR simple name
 router.post('/login', async (req, res) => {
   try {
-    const { name, password } = req.body;
+    const { email, password, name, avatar } = req.body;
 
-    if (!name || !password) {
-      return res.status(400).json({ error: 'Nom et mot de passe requis' });
-    }
-
-    const nameTrim = name.trim();
-
-    // 1) Try exact match (fast via unique index)
-    let user = await prisma.user.findUnique({
-      where: { name: nameTrim },
-      select: { id: true, name: true, password: true, avatar: true }
-    });
-
-    // 2) Fallback: case-insensitive match (scan small user list)
-    if (!user) {
-      const candidates = await prisma.user.findMany({
-        select: { id: true, name: true, password: true, avatar: true }
+    // Email/password auth (for demo/production)
+    if (email && password) {
+      const user = await prisma.user.findFirst({
+        where: { email }
       });
-      user = candidates.find(u => u.name.toLowerCase() === nameTrim.toLowerCase()) || null;
-    }
 
-    if (!user) {
-      return res.status(401).json({ error: 'Utilisateur non trouvé' });
-    }
-
-    // Check password (if user has no password, allow login for backward compatibility)
-    if (user.password) {
-      const isValidPassword = await bcrypt.compare(password, user.password);
-      if (!isValidPassword) {
-        return res.status(401).json({ error: 'Mot de passe incorrect' });
+      if (!user || !user.password) {
+        return res.status(401).json({ error: 'Invalid credentials' });
       }
-    }
 
-    // Return user without password
-    const { password: _, ...userWithoutPassword } = user;
-    res.json({ user: userWithoutPassword });
+      const validPassword = await bcrypt.compare(password, user.password);
+      if (!validPassword) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
+
+      // Update online status
+      const updatedUser = await prisma.user.update({
+        where: { id: user.id },
+        data: { isOnline: true }
+      });
+
+      const { password: _, ...userWithoutPassword } = updatedUser;
+      res.json(userWithoutPassword);
+    }
+    // Simple name-based login (for open source version)
+    else if (name) {
+      let user = await prisma.user.findUnique({
+        where: { name }
+      });
+
+      if (!user) {
+        user = await prisma.user.create({
+          data: {
+            name,
+            avatar: avatar || '👤',
+            isOnline: true
+          }
+        });
+      } else {
+        user = await prisma.user.update({
+          where: { id: user.id },
+          data: { isOnline: true }
+        });
+      }
+
+      res.json(user);
+    } else {
+      res.status(400).json({ error: 'Email/password or name required' });
+    }
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ error: 'Erreur de connexion' });
+    res.status(500).json({ error: 'Login failed' });
   }
 });
 
-// POST /api/auth/register
+// Register new user
 router.post('/register', async (req, res) => {
   try {
-    const { name, password, avatar } = req.body;
+    const { email, password, name, avatar } = req.body;
 
-    if (!name?.trim()) {
-      return res.status(400).json({ error: 'Le nom est obligatoire' });
+    if (!email || !password || !name) {
+      return res.status(400).json({ error: 'Email, password and name required' });
     }
 
-    if (!password || password.length < 3) {
-      return res.status(400).json({ error: 'Le mot de passe doit contenir au moins 3 caractères' });
-    }
+    // Check if email exists
+    const existing = await prisma.user.findFirst({
+      where: { email }
+    });
 
-    const nameTrim = name.trim();
-
-    // Check if user already exists (case-insensitive)
-    let existingUser = await prisma.user.findUnique({ where: { name: nameTrim } });
-    if (!existingUser) {
-      const candidates = await prisma.user.findMany({ select: { id: true, name: true } });
-      existingUser = candidates.find(u => u.name.toLowerCase() === nameTrim.toLowerCase()) || null;
-    }
-
-    if (existingUser) {
-      return res.status(400).json({ error: 'Un utilisateur avec ce nom existe déjà' });
+    if (existing) {
+      return res.status(400).json({ error: 'Email already exists' });
     }
 
     // Hash password
@@ -83,127 +88,19 @@ router.post('/register', async (req, res) => {
     // Create user
     const user = await prisma.user.create({
       data: {
-        name: nameTrim,
+        email,
         password: hashedPassword,
-        avatar: avatar || '👤'
-      }
-    });
-
-    // Return user without password
-    const { password: _, ...userWithoutPassword } = user;
-    res.status(201).json({ user: userWithoutPassword });
-  } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({ error: 'Erreur lors de la création du compte' });
-  }
-});
-
-// PATCH /api/auth/change-password
-router.patch('/change-password', async (req, res) => {
-  try {
-    const { userId, currentPassword, newPassword } = req.body;
-
-    if (!userId || !newPassword) {
-      return res.status(400).json({ error: 'ID utilisateur et nouveau mot de passe requis' });
-    }
-
-    if (newPassword.length < 3) {
-      return res.status(400).json({ error: 'Le mot de passe doit contenir au moins 3 caractères' });
-    }
-
-    // Find user
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { id: true, password: true }
-    });
-
-    if (!user) {
-      return res.status(404).json({ error: 'Utilisateur non trouvé' });
-    }
-
-    // Verify current password if user has one
-    if (user.password && currentPassword) {
-      const isValidPassword = await bcrypt.compare(currentPassword, user.password);
-      if (!isValidPassword) {
-        return res.status(401).json({ error: 'Mot de passe actuel incorrect' });
-      }
-    }
-
-    // Hash new password
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-    // Update password
-    await prisma.user.update({
-      where: { id: userId },
-      data: { password: hashedPassword }
-    });
-
-    res.json({ message: 'Mot de passe mis à jour avec succès' });
-  } catch (error) {
-    console.error('Change password error:', error);
-    res.status(500).json({ error: 'Erreur lors du changement de mot de passe' });
-  }
-});
-
-// GET /api/auth/users (for admin or user management)
-router.get('/users', async (req, res) => {
-  try {
-    const users = await prisma.user.findMany({
-      select: {
-        id: true,
-        name: true,
-        avatar: true,
-        isOnline: true,
-        _count: {
-          select: {
-            assignedTasks: true,
-            ownedTasks: true,
-            comments: true
-          }
-        }
-      },
-      orderBy: [
-        { isOnline: 'desc' },
-        { name: 'asc' }
-      ]
-    });
-
-    res.json(users);
-  } catch (error) {
-    console.error('Error fetching users:', error);
-    res.status(500).json({ error: 'Erreur lors de la récupération des utilisateurs' });
-  }
-});
-
-// PATCH /api/auth/users/:id (edit user)
-router.patch('/users/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { name, avatar } = req.body;
-
-    const updateData = {};
-    if (name !== undefined) updateData.name = name.trim();
-    if (avatar !== undefined) updateData.avatar = avatar;
-
-    const user = await prisma.user.update({
-      where: { id },
-      data: updateData,
-      select: {
-        id: true,
-        name: true,
-        avatar: true,
+        name,
+        avatar: avatar || '👤',
         isOnline: true
       }
     });
 
-    res.json(user);
+    const { password: _, ...userWithoutPassword } = user;
+    res.status(201).json(userWithoutPassword);
   } catch (error) {
-    console.error('Error updating user:', error);
-    if (error.code === 'P2002') {
-      res.status(400).json({ error: 'Ce nom d\'utilisateur est déjà pris' });
-    } else {
-      res.status(500).json({ error: 'Erreur lors de la mise à jour' });
-    }
+    console.error('Register error:', error);
+    res.status(500).json({ error: 'Registration failed' });
   }
 });
 

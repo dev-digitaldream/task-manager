@@ -34,6 +34,9 @@ RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
 COPY --from=server-builder --chown=nodejs:nodejs /app/server ./server
 COPY --from=client-builder --chown=nodejs:nodejs /app/client/dist ./server/public
 
+# Copy Outlook add-in files
+COPY --chown=nodejs:nodejs outlook-addin ./server/outlook-addin
+
 # Create data directory for SQLite with proper permissions
 RUN mkdir -p /app/data && chown -R nodejs:nodejs /app/data
 

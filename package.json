@@ -2,6 +2,7 @@
   "name": "collaborative-todo",
   "version": "1.0.0",
   "description": "Simple collaborative todo app with real-time sync",
+  "main": "electron/main.js",
   "scripts": {
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "server": "cd server && npm run dev",
@@ -9,9 +10,21 @@
     "build": "cd client && npm run build",
     "start": "cd server && npm start",
     "setup": "npm install && cd server && npm install && npx prisma generate && npx prisma db push && npm run db:seed && cd ../client && npm install",
-    "db:setup": "cd server && npx prisma generate && npx prisma db push && npm run db:seed"
+    "db:setup": "cd server && npx prisma generate && npx prisma db push && npm run db:seed",
+    "electron": "node electron/start.js",
+    "electron:build": "npm run build && electron-builder",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build",
+    "tauri:build:debug": "tauri build --debug",
+    "tauri:icon": "tauri icon"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "@tauri-apps/api": "^2.8.0",
+    "@tauri-apps/cli": "^2.8.4",
+    "concurrently": "^8.2.2",
+    "electron": "^38.2.0",
+    "electron-builder": "^26.0.12",
+    "wait-on": "^9.0.1"
   }
 }

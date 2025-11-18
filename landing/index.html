@@ -1,10 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#6366f1">
     <title>Task Manager - Open Source Collaborative Task Management</title>
     <meta name="description" content="Professional task management with real-time collaboration. Open source, self-hostable, and beautiful.">
+    <meta name="keywords" content="task manager, project management, open source, self-hosted, collaboration, kanban">
+    <meta name="author" content="Digital Dream">
+    <link rel="canonical" href="https://task-manager-landing.pages.dev/">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://task-manager-landing.pages.dev/">
+    <meta property="og:title" content="Task Manager - Open Source Collaborative Task Management">
+    <meta property="og:description" content="Professional task management with real-time collaboration. Open source, self-hostable, and beautiful.">
+    <meta property="og:image" content="https://task-manager-landing.pages.dev/images/dashboard.webp">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://task-manager-landing.pages.dev/">
+    <meta property="twitter:title" content="Task Manager - Open Source Collaborative Task Management">
+    <meta property="twitter:description" content="Professional task management with real-time collaboration. Open source, self-hostable, and beautiful.">
+    <meta property="twitter:image" content="https://task-manager-landing.pages.dev/images/dashboard.webp">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,22 +54,22 @@
                     <span></span>
                     <span></span>
                 </div>
-                <div class="nav-links" id="navLinks">
-                    <a href="#features">Features</a>
-                    <a href="#pricing">Pricing</a>
-                    <a href="https://github.com/dev-digitaldream/task-manager" target="_blank">GitHub</a>
-                    <a href="https://task-manager.digitaldream.work/login" class="btn-primary">Try Demo</a>
-                </div>
+                <nav class="nav-links" id="navLinks" aria-label="Main navigation">
+                    <a href="#features" aria-label="View features">Features</a>
+                    <a href="#pricing" aria-label="View pricing">Pricing</a>
+                    <a href="https://github.com/dev-digitaldream/task-manager" target="_blank" rel="noopener noreferrer" aria-label="View on GitHub">GitHub</a>
+                    <a href="https://task-manager.digitaldream.work/login" class="btn-primary" aria-label="Try demo">Try Demo</a>
+                </nav>
             </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <section class="hero">
+    <section class="hero" aria-labelledby="hero-title">
         <div class="container">
             <div class="hero-content">
                 <div class="badge">Open Source • Self-Hostable • Free Forever</div>
-                <h1 class="hero-title">
+                <h1 id="hero-title" class="hero-title">
                     Task management<br/>
                     <span class="gradient-text">that just works</span>
                 </h1>
@@ -60,13 +78,13 @@
                     Open source with optional cloud hosting.
                 </p>
                 <div class="hero-cta">
-                    <a href="https://task-manager.digitaldream.work/login" class="btn-large btn-primary">
+                    <a href="https://task-manager.digitaldream.work/login" class="btn-large btn-primary" aria-label="Try live demo of Task Manager">
                         Try Live Demo
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                             <path d="M7 3L14 10L7 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </a>
-                    <a href="https://github.com/dev-digitaldream/task-manager" class="btn-large btn-secondary">
+                    <a href="https://github.com/dev-digitaldream/task-manager" class="btn-large btn-secondary" aria-label="View Task Manager on GitHub">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z"/>
                         </svg>
@@ -103,17 +121,17 @@
         <div class="container">
             <div class="screenshot-wrapper">
                 <div class="screenshot-glow"></div>
-                <img src="https://via.placeholder.com/1200x800/1e293b/64748b?text=Task+Manager+Dashboard" alt="Task Manager Dashboard" class="screenshot-img">
+                <img src="images/dashboard.webp" alt="Task Manager Dashboard showing task list with real-time collaboration features" class="screenshot-img" width="1200" height="800" loading="lazy">
             </div>
         </div>
     </section>
 
     <!-- Features Section -->
-    <section id="features" class="features">
+    <section id="features" class="features" aria-labelledby="features-title">
         <div class="container">
             <div class="section-header">
                 <div class="badge">Features</div>
-                <h2 class="section-title">Everything you need.<br/>Nothing you don't.</h2>
+                <h2 id="features-title" class="section-title">Everything you need.<br/>Nothing you don't.</h2>
                 <p class="section-subtitle">Powerful features wrapped in a beautiful, intuitive interface.</p>
             </div>
 
@@ -184,11 +202,11 @@
     </section>
 
     <!-- Pricing Section -->
-    <section id="pricing" class="pricing">
+    <section id="pricing" class="pricing" aria-labelledby="pricing-title">
         <div class="container">
             <div class="section-header">
                 <div class="badge">Pricing</div>
-                <h2 class="section-title">Simple, transparent pricing</h2>
+                <h2 id="pricing-title" class="section-title">Simple, transparent pricing</h2>
                 <p class="section-subtitle">Self-host for free, or let us handle the infrastructure.</p>
             </div>
 
@@ -209,7 +227,7 @@
                         <li>✓ Community support</li>
                         <li>✓ MIT License</li>
                     </ul>
-                    <a href="https://github.com/dev-digitaldream/task-manager" class="btn-pricing">Get Started</a>
+                    <a href="https://github.com/dev-digitaldream/task-manager" class="btn-pricing" aria-label="Get started with open source version">Get Started</a>
                 </div>
 
                 <div class="pricing-card pricing-featured">
@@ -230,7 +248,7 @@
                         <li>✓ File uploads</li>
                         <li>✓ Priority support</li>
                     </ul>
-                    <a href="https://task-manager.digitaldream.work/login" class="btn-pricing btn-pricing-featured">Try Demo</a>
+                    <a href="https://task-manager.digitaldream.work/login" class="btn-pricing btn-pricing-featured" aria-label="Try Cloud Pro demo">Try Demo</a>
                 </div>
 
                 <div class="pricing-card">
@@ -250,7 +268,7 @@
                         <li>✓ SLA 99.95%</li>
                         <li>✓ Dedicated support</li>
                     </ul>
-                    <a href="mailto:dev@digitaldream.work" class="btn-pricing">Contact Sales</a>
+                    <a href="mailto:dev@digitaldream.work" class="btn-pricing" aria-label="Contact sales for Enterprise plan">Contact Sales</a>
                 </div>
             </div>
         </div>
@@ -263,13 +281,13 @@
                 <h2 class="cta-title">Ready to get started?</h2>
                 <p class="cta-subtitle">Try the demo or deploy your own instance in minutes.</p>
                 <div class="cta-buttons">
-                    <a href="https://task-manager.digitaldream.work/login" class="btn-large btn-primary">
+                    <a href="https://task-manager.digitaldream.work/login" class="btn-large btn-primary" aria-label="Try live demo">
                         Try Live Demo
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                             <path d="M7 3L14 10L7 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </a>
-                    <a href="https://github.com/dev-digitaldream/task-manager" class="btn-large btn-secondary">View Documentation</a>
+                    <a href="https://github.com/dev-digitaldream/task-manager" class="btn-large btn-secondary" aria-label="View documentation on GitHub">View Documentation</a>
                 </div>
             </div>
         </div>
@@ -323,21 +341,21 @@
                 <div class="footer-links">
                     <div class="footer-column">
                         <h4>Product</h4>
-                        <a href="#features">Features</a>
-                        <a href="#pricing">Pricing</a>
-                        <a href="https://task-manager.digitaldream.work/login">Demo</a>
+                        <a href="#features" aria-label="View features section">Features</a>
+                        <a href="#pricing" aria-label="View pricing section">Pricing</a>
+                        <a href="https://task-manager.digitaldream.work/login" aria-label="Try live demo">Demo</a>
                     </div>
                     <div class="footer-column">
                         <h4>Resources</h4>
-                        <a href="https://github.com/dev-digitaldream/task-manager">GitHub</a>
-                        <a href="https://github.com/dev-digitaldream/task-manager#readme">Documentation</a>
-                        <a href="https://github.com/dev-digitaldream/task-manager/issues">Support</a>
+                        <a href="https://github.com/dev-digitaldream/task-manager" aria-label="View project on GitHub">GitHub</a>
+                        <a href="https://github.com/dev-digitaldream/task-manager#readme" aria-label="Read documentation">Documentation</a>
+                        <a href="https://github.com/dev-digitaldream/task-manager/issues" aria-label="Get support">Support</a>
                     </div>
                     <div class="footer-column">
                         <h4>Company</h4>
-                        <a href="https://www.digitaldream.work">Digital Dream</a>
-                        <a href="mailto:dev@digitaldream.work">Contact</a>
-                        <a href="https://github.com/dev-digitaldream/task-manager/blob/main/LICENSE">License</a>
+                        <a href="https://www.digitaldream.work" aria-label="Visit Digital Dream website">Digital Dream</a>
+                        <a href="mailto:dev@digitaldream.work" aria-label="Contact us via email">Contact</a>
+                        <a href="https://github.com/dev-digitaldream/task-manager/blob/main/LICENSE" aria-label="View MIT license">License</a>
                     </div>
                 </div>
             </div>
@@ -345,7 +363,7 @@
             <div class="footer-bottom">
                 <p>© 2025 Digital Dream. Open source under MIT License.</p>
                 <div class="footer-social">
-                    <a href="https://github.com/dev-digitaldream" target="_blank">
+                    <a href="https://github.com/dev-digitaldream" target="_blank" rel="noopener noreferrer" aria-label="Visit our GitHub profile">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z"/>
                         </svg>

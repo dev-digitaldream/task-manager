@@ -60,19 +60,18 @@ window.addEventListener('scroll', () => {
 });
 
 // Intersection Observer for fade-in animations
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -100px 0px'
-};
-
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
             entry.target.style.opacity = '1';
             entry.target.style.transform = 'translateY(0)';
+            observer.unobserve(entry.target); // Stop observing after animation
         }
     });
-}, observerOptions);
+}, {
+    threshold: 0.1,
+    rootMargin: '0px 0px -100px 0px'
+});
 
 // Observe elements for animation
 document.querySelectorAll('.feature-card, .pricing-card').forEach(el => {
@@ -157,3 +156,11 @@ setTimeout(() => {
         }, 100 * index);
     });
 }, 500);
+
+// Fix back/forward cache (bfcache)
+window.addEventListener('pageshow', (event) => {
+    if (event.persisted) {
+        // Page was restored from bfcache
+        window.location.reload();
+    }
+});

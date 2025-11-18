@@ -3,7 +3,7 @@ import { LogIn, UserPlus, Eye, EyeOff, Moon, Sun } from 'lucide-react'
 
 const LoginForm = ({ onLogin, darkMode, onToggleDarkMode }) => {
   const [isLogin, setIsLogin] = useState(true)
-  const [useEmail, setUseEmail] = useState(true) // Toggle between email and simple auth
+  const [useEmail, setUseEmail] = useState(false) // Toggle between email and simple auth - DEFAULT: Simple mode
   const [formData, setFormData] = useState({
     email: '',
     name: '',

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Simbase Activator</title>
+    <style>
+      body { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 24px; }
+      h1 { margin-top: 0; }
+      .card { border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+      label { display: block; font-weight: 600; margin-bottom: 6px; }
+      input[type="text"], input[type="password"], input[type="url"] { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; }
+      input[type="file"] { padding: 6px 0; }
+      .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      .actions { display: flex; gap: 12px; flex-wrap: wrap; }
+      button { background: #2563eb; color: white; border: 0; padding: 10px 14px; border-radius: 8px; cursor: pointer; }
+      button.secondary { background: #111827; }
+      button.ghost { background: #6b7280; }
+      .muted { color: #6b7280; font-size: 12px; }
+      .log { white-space: pre-wrap; background: #0b1020; color: #d1e7ff; padding: 12px; border-radius: 8px; min-height: 120px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+      table { width: 100%; border-collapse: collapse; }
+      th, td { border-bottom: 1px solid #e5e7eb; text-align: left; padding: 8px; }
+      th { background: #f9fafb; }
+    </style>
+  </head>
+  <body>
+    <h1>Simbase Activator</h1>
+
+    <div class="card">
+      <div class="row">
+        <div>
+          <label for="apiToken">Clé API Simbase</label>
+          <input id="apiToken" type="password" placeholder="sk_live_***" autocomplete="off" />
+          <div class="muted">Votre clé n'est jamais écrite sur disque. Utilisée uniquement pour les appels HTTP.</div>
+        </div>
+        <div>
+          <label for="baseUrl">URL API (configurable)</label>
+          <input id="baseUrl" type="url" placeholder="https://api.simbase.com" value="https://api.simbase.com" />
+          <div class="muted">Changez si vous utilisez un environnement de test.</div>
+        </div>
+      </div>
+      <div class="row" style="margin-top:12px;">
+        <div>
+          <label for="apiVersion">Version de l'API</label>
+          <select id="apiVersion" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
+            <option value="v1">v1</option>
+            <option value="v2">v2</option>
+          </select>
+          <div class="muted">Choisissez l'API Simbase à utiliser.</div>
+        </div>
+        <div>
+          <label for="authType">Type d'authentification</label>
+          <select id="authType" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
+            <option value="bearer">Authorization: Bearer &lt;token&gt;</option>
+            <option value="x-api-key">X-API-Key: &lt;token&gt;</option>
+          </select>
+          <div class="muted">Selon la version API, l'en-tête peut varier.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <div>
+          <label for="csvFile">Importer CSV</label>
+          <input id="csvFile" type="file" accept=".csv" />
+          <div class="muted">Format attendu: iccid,device_name</div>
+        </div>
+        <div>
+          <label for="dryRun">
+            <input id="dryRun" type="checkbox" checked /> Mode simulation (aucun appel API)
+          </label>
+          <div class="muted">Décochez pour activer les appels API réels.</div>
+        </div>
+      </div>
+      <div class="row" style="margin-top:12px;">
+        <div>
+          <label for="pathTemplate">Modèle d'endpoint</label>
+          <input id="pathTemplate" type="text" value="/{version}/sims/{iccid}" />
+          <div class="muted">Utilisez {version} et {iccid}. Exemple: /{version}/sims/{iccid}</div>
+        </div>
+        <div></div>
+      </div>
+      <div class="actions" style="margin-top:12px;">
+        <button id="btnPreview" class="secondary">Prévisualiser CSV</button>
+        <button id="btnProcess">Traiter les SIM</button>
+        <button id="btnExport" class="ghost">Exporter résultats</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Prévisualisation</h3>
+      <div id="preview"></div>
+    </div>
+
+    <div class="card">
+      <h3>Journal</h3>
+      <div id="log" class="log"></div>
+    </div>
+
+    <script>
+      // Wait for Tauri to inject globals when loading from filesystem
+      function wait(ms){ return new Promise(r=>setTimeout(r, ms)); }
+      async function awaitTauri(maxMs = 3000) {
+        const start = Date.now();
+        while (Date.now() - start < maxMs) {
+          if (window.__TAURI__ && window.__TAURI__.http && typeof window.__TAURI__.http.fetch === 'function') {
+            return window.__TAURI__.http;
+          }
+          await wait(50);
+        }
+        throw new Error('API Tauri HTTP non disponible');
+      }
+
+      const $ = (id) => document.getElementById(id);
+      const logEl = $('log');
+      function log(msg) {
+        const t = new Date().toLocaleTimeString();
+        logEl.textContent += `[${t}] ${msg}\n`;
+        logEl.scrollTop = logEl.scrollHeight;
+      }
+
+      function parseCSV(text) {
+        const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+        if (lines.length === 0) return [];
+        const header = lines[0].split(',').map(h => h.trim());
+        const rows = [];
+        for (let i = 1; i < lines.length; i++) {
+          const cols = lines[i].split(',');
+          const row = {};
+          header.forEach((h, idx) => row[h] = (cols[idx] || '').trim());
+          if (row.iccid) rows.push(row);
+        }
+        return rows;
+      }
+
+      function previewRows(rows) {
+        if (!rows.length) { $('preview').innerHTML = '<div class="muted">Aucune donnée</div>'; return; }
+        const head = Object.keys(rows[0]);
+        const th = head.map(h => `<th>${h}</th>`).join('');
+        const tr = rows.map(r => `<tr>${head.map(h => `<td>${(r[h]||'')}</td>`).join('')}</tr>`).join('');
+        $('preview').innerHTML = `<table><thead><tr>${th}</tr></thead><tbody>${tr}</tbody></table>`;
+      }
+
+      async function readSelectedCSV() {
+        const file = $('csvFile').files[0];
+        if (!file) throw new Error('Veuillez choisir un fichier CSV');
+        const text = await file.text();
+        return parseCSV(text);
+      }
+
+      async function processRows(rows) {
+        const baseUrl = $('baseUrl').value.replace(/\/$/, '');
+        const apiVersion = $('apiVersion').value;
+        const authType = $('authType').value;
+        const pathTemplate = $('pathTemplate').value || '/{version}/sims/{iccid}';
+        const token = $('apiToken').value.trim();
+        const dryRun = $('dryRun').checked;
+
+        if (!rows.length) { log('Aucune ligne à traiter.'); return []; }
+        if (!dryRun && (!token || token.length < 8)) throw new Error('Clé API invalide');
+        const http = await awaitTauri();
+
+        const results = [];
+
+        for (const [idx, row] of rows.entries()) {
+          const iccid = (row.iccid || '').trim();
+          const deviceName = (row.device_name || row.name || '').trim();
+          if (!iccid) { results.push({ iccid, status: 'skipped', message: 'ICCID manquant' }); continue; }
+
+          try {
+            if (dryRun) {
+              log(`(Simulation) Traitement ${iccid}${deviceName ? ' → '+deviceName : ''}`);
+              results.push({ iccid, status: 'simulated', message: 'OK' });
+              continue;
+            }
+
+            // Exemple d'endpoint selon la version API (à ajuster selon la doc Simbase)
+            // v1: PATCH /v1/sims/:iccid
+            // v2: PATCH /v2/sims/:iccid
+            const path = pathTemplate
+              .replace('{version}', encodeURIComponent(apiVersion))
+              .replace('{iccid}', encodeURIComponent(iccid))
+              .replace(/\/{2,}/g, '/');
+            const url = `${baseUrl}${path.startsWith('/') ? '' : '/'}${path}`;
+            const headers = { 'Content-Type': 'application/json' };
+            if (authType === 'bearer') headers['Authorization'] = `Bearer ${token}`;
+            else if (authType === 'x-api-key') headers['X-API-Key'] = token;
+            // Appel réel PATCH (ajustez le payload selon la doc exacte Simbase)
+            const res = await http.fetch(url, {
+              method: 'PATCH',
+              headers,
+              body: { type: 'Json', payload: { state: 'enabled', name: deviceName || undefined } }
+            });
+            if (res.status >= 200 && res.status < 300) {
+              log(`OK (${apiVersion}) ${iccid}: HTTP ${res.status}`);
+              results.push({ iccid, status: 'ok', message: `HTTP ${res.status}` });
+            } else {
+              let details = '';
+              try { details = res.data ? JSON.stringify(res.data).slice(0, 200) : ''; } catch {}
+              log(`Erreur API (${apiVersion}) ${iccid}: HTTP ${res.status} ${details}`);
+              results.push({ iccid, status: 'error', message: `HTTP ${res.status}` });
+            }
+            // Petit délai pour éviter un throttling éventuel
+            await new Promise(r => setTimeout(r, 80));
+          } catch (e) {
+            const msg = (e && e.message) ? e.message : String(e);
+            log(`Erreur ${iccid}: ${msg}`);
+            results.push({ iccid, status: 'error', message: msg });
+          }
+        }
+
+        return results;
+      }
+
+      function exportCSV(rows) {
+        if (!rows.length) { log('Rien à exporter.'); return; }
+        const head = Object.keys(rows[0]);
+        const csv = [head.join(',')].concat(rows.map(r => head.map(h => (r[h] ?? '')).join(','))).join('\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'simbase_results.csv'; a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      // Wire UI
+      $('btnPreview').addEventListener('click', async () => {
+        try { const rows = await readSelectedCSV(); previewRows(rows); log(`Prévisualisation: ${rows.length} lignes`); }
+        catch (e) { log(e.message || String(e)); }
+      });
+
+      let lastResults = [];
+      $('btnProcess').addEventListener('click', async () => {
+        try {
+          const rows = await readSelectedCSV();
+          previewRows(rows);
+          log(`Traitement démarré (${rows.length} éléments)...`);
+          lastResults = await processRows(rows);
+          log(`Terminé. Succès: ${lastResults.filter(r=>r.status==='ok' || r.status==='simulated').length} | Erreurs: ${lastResults.filter(r=>r.status==='error').length}`);
+        } catch (e) {
+          log(e.message || String(e));
+        }
+      });
+
+      $('btnExport').addEventListener('click', () => exportCSV(lastResults));
+    </script>
+  </body>
+  </html>

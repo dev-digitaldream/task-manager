@@ -58,6 +58,16 @@ const TaskItem = ({ task, users, currentUser, onUpdate, onDelete, onEdit, onAddC
     return map[p] || map.medium
   }
 
+  const getPriorityBorderColor = (p) => {
+    const map = {
+      low: 'border-l-gray-400 dark:border-l-gray-500',
+      medium: 'border-l-yellow-500',
+      high: 'border-l-orange-500',
+      urgent: 'border-l-red-500'
+    }
+    return map[p] || map.medium
+  }
+
   const getApprovalColor = (a) => {
     const map = {
       none: 'bg-gray-400 dark:bg-gray-500',
@@ -114,9 +124,11 @@ const TaskItem = ({ task, users, currentUser, onUpdate, onDelete, onEdit, onAddC
   const isOwner = currentUser && task.ownerId === currentUser.id
 
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-lg border transition-colors ${
-      isOverdue && task.status !== 'done' 
-        ? 'task-overdue border-red-200 dark:border-red-800' 
+    <div className={`bg-white dark:bg-gray-800 rounded-lg border-l-4 border-r border-t border-b transition-colors ${
+      getPriorityBorderColor(priority)
+    } ${
+      isOverdue && task.status !== 'done'
+        ? 'task-overdue border-red-200 dark:border-red-800'
         : 'border-gray-200 dark:border-gray-700'
     }`}>
       <div className="p-6">

@@ -1,0 +1,20 @@
+{
+  "name": "simbase-activator",
+  "version": "1.0.0",
+  "description": "Activateur Simbase - Gestion en lot de cartes SIM",
+  "author": "Mohammed",
+  "license": "MIT",
+  "scripts": {
+    "tauri": "tauri",
+    "dev": "tauri dev",
+    "build": "tauri build",
+    "build:mac": "tauri build --target universal-apple-darwin",
+    "build:windows": "tauri build --target x86_64-pc-windows-msvc"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^1.6.0"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^1.5.9"
+  }
+}

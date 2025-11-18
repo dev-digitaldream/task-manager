@@ -38,16 +38,17 @@ const helmetConfig = helmet({
     directives: {
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"], // Required for Vite dev
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://appsforoffice.microsoft.com"], // Required for Vite dev + Office.js
       imgSrc: ["'self'", "data:", "https:", "blob:"],
-      connectSrc: ["'self'", "wss:", "ws:"],
+      connectSrc: ["'self'", "wss:", "ws:", "https://outlook.office.com", "https://outlook.office365.com"],
       fontSrc: ["'self'", "data:"],
       objectSrc: ["'none'"],
       mediaSrc: ["'self'"],
-      frameSrc: ["'none'"],
+      frameSrc: ["'self'", "https://outlook.office.com", "https://outlook.office365.com", "https://outlook.live.com"],
+      frameAncestors: ["https://outlook.office.com", "https://outlook.office365.com", "https://outlook.live.com", "https://*.outlook.office.com"],
     },
   },
-  crossOriginEmbedderPolicy: false, // Allow Cloudinary images
+  crossOriginEmbedderPolicy: false, // Allow Cloudinary images + Outlook embedding
   crossOriginResourcePolicy: { policy: "cross-origin" },
 });
 
@@ -59,9 +60,20 @@ const requestSizeLimits = {
 
 // CORS configuration
 const getCorsOptions = () => {
-  const allowedOrigins = process.env.CORS_ORIGINS
+  const baseOrigins = process.env.CORS_ORIGINS
     ? process.env.CORS_ORIGINS.split(',')
     : ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'http://localhost:5176'];
+
+  // Always include Outlook domains for add-in support
+  const outlookOrigins = [
+    'https://outlook.office.com',
+    'https://outlook.office365.com',
+    'https://outlook.live.com',
+    'https://outlook-sdf.office.com',
+    'https://outlook-sdf.office365.com',
+  ];
+
+  const allowedOrigins = [...baseOrigins, ...outlookOrigins];
 
   return {
     origin: (origin, callback) => {

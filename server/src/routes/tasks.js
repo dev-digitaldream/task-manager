@@ -447,4 +447,126 @@ router.post('/:id/claim', async (req, res) => {
   }
 });
 
+// GET /api/tasks/export/ical - Export tasks as iCal file
+router.get('/export/ical', async (req, res) => {
+  try {
+    const { userId } = req.query;
+
+    // Fetch tasks for user or all public tasks
+    const tasks = await prisma.task.findMany({
+      where: userId ? {
+        OR: [
+          { assigneeId: parseInt(userId) },
+          { ownerId: parseInt(userId) },
+          { isPublic: true }
+        ]
+      } : { isPublic: true },
+      include: {
+        assignee: { select: { name: true } },
+        owner: { select: { name: true } }
+      }
+    });
+
+    // Generate iCal content
+    const lines = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Task Manager//Digital Dream//EN',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+      'X-WR-CALNAME:Mes Tâches',
+      'X-WR-TIMEZONE:Europe/Paris'
+    ];
+
+    tasks.forEach(task => {
+      const uid = `task-${task.id}@taskmanager.digitaldream.work`;
+      const dtstamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+      const created = new Date(task.createdAt).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+
+      lines.push('BEGIN:VTODO');
+      lines.push(`UID:${uid}`);
+      lines.push(`DTSTAMP:${dtstamp}`);
+      lines.push(`CREATED:${created}`);
+      lines.push(`SUMMARY:${task.title.replace(/[,;\\]/g, '\\$&')}`);
+
+      if (task.dueDate) {
+        const due = new Date(task.dueDate).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+        lines.push(`DUE:${due}`);
+      }
+
+      // Status mapping
+      const statusMap = { todo: 'NEEDS-ACTION', doing: 'IN-PROCESS', done: 'COMPLETED' };
+      lines.push(`STATUS:${statusMap[task.status] || 'NEEDS-ACTION'}`);
+
+      // Priority mapping (1=high, 5=medium, 9=low)
+      const priorityMap = { urgent: '1', high: '3', medium: '5', low: '9' };
+      lines.push(`PRIORITY:${priorityMap[task.priority] || '5'}`);
+
+      if (task.assignee) {
+        lines.push(`ORGANIZER;CN=${task.assignee.name}:mailto:noreply@taskmanager.local`);
+      }
+
+      if (task.status === 'done' && task.updatedAt) {
+        const completed = new Date(task.updatedAt).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+        lines.push(`COMPLETED:${completed}`);
+        lines.push('PERCENT-COMPLETE:100');
+      } else if (task.status === 'doing') {
+        lines.push('PERCENT-COMPLETE:50');
+      } else {
+        lines.push('PERCENT-COMPLETE:0');
+      }
+
+      lines.push('END:VTODO');
+    });
+
+    lines.push('END:VCALENDAR');
+
+    const icalContent = lines.join('\r\n');
+
+    res.setHeader('Content-Type', 'text/calendar; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="tasks-${new Date().toISOString().split('T')[0]}.ics"`);
+    res.send(icalContent);
+
+  } catch (error) {
+    console.error('Error exporting iCal:', error);
+    res.status(500).json({ error: 'Failed to export tasks' });
+  }
+});
+
+// GET /api/tasks/subscribe/ical - Generate webcal subscription URL
+router.get('/subscribe/ical', async (req, res) => {
+  try {
+    const { userId } = req.query;
+
+    // Generate a simple token (in production, use proper auth tokens)
+    const token = Buffer.from(`user-${userId}-${Date.now()}`).toString('base64').substring(0, 32);
+
+    // In a real app, store this token in DB associated with userId
+
+    const protocol = req.protocol === 'https' ? 'webcal' : 'http';
+    const host = req.get('host');
+    const url = `${protocol}://${host}/api/tasks/feed/ical?token=${token}&userId=${userId}`;
+
+    res.json({ url, token });
+  } catch (error) {
+    console.error('Error generating subscription:', error);
+    res.status(500).json({ error: 'Failed to generate subscription' });
+  }
+});
+
+// GET /api/tasks/feed/ical - iCal feed for calendar subscriptions
+router.get('/feed/ical', async (req, res) => {
+  try {
+    const { userId, token } = req.query;
+
+    // In production: validate token here
+
+    // Redirect to the export endpoint
+    res.redirect(`/api/tasks/export/ical?userId=${userId}`);
+  } catch (error) {
+    console.error('Error serving iCal feed:', error);
+    res.status(500).json({ error: 'Failed to serve feed' });
+  }
+});
+
 module.exports = router;

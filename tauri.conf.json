@@ -1,0 +1,20 @@
+{
+  "productName": "Task Manager",
+  "version": "1.0.0",
+  "identifier": "work.digitaldream.taskmanager",
+  "build": {
+    "beforeDevCommand": "",
+    "beforeBuildCommand": "npm run build",
+    "devUrl": "http://localhost:5173",
+    "frontendDist": "../client/dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Task Manager",
+        "width": 1400,
+        "height": 900
+      }
+    ]
+  }
+}

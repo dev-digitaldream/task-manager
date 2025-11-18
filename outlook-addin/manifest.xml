@@ -7,7 +7,7 @@
     xsi:type="MailApp">
 
   <!-- Basic Settings -->
-  <Id>e4b1c9d0-1234-5678-9abc-def012345678</Id>
+  <Id>99a09b40-9d5c-406a-96cc-ae5ff0333ff0</Id>
   <Version>1.0.0.0</Version>
   <ProviderName>Todo Collaboratif</ProviderName>
   <DefaultLocale>fr-FR</DefaultLocale>

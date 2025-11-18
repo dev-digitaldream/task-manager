@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="64" height="64" fill="#0f172a" rx="9.6"/>
+
+  <!-- Checklist icon -->
+  <g transform="translate(12.8, 12.8)">
+    <!-- Paper/Document -->
+    <rect x="0" y="0" width="38.4" height="41.6" fill="white" rx="3.2"/>
+
+    <!-- Check marks -->
+    <g stroke="#10b981" stroke-width="5.12" stroke-linecap="round" fill="none">
+      <!-- First check -->
+      <polyline points="6.4,9.6 9.6,12.8 16,5.12" />
+      <!-- Second check -->
+      <polyline points="6.4,19.2 9.6,22.4 16,14.72" />
+      <!-- Third check (partial) -->
+      <line x1="6.4" y1="28.8" x2="12.8" y2="28.8" stroke="#94a3b8" />
+    </g>
+
+    <!-- Lines for tasks -->
+    <g stroke="#cbd5e1" stroke-width="1.28">
+      <line x1="19.2" y1="9.6" x2="35.2" y2="9.6" />
+      <line x1="19.2" y1="19.2" x2="35.2" y2="19.2" />
+      <line x1="19.2" y1="28.8" x2="35.2" y2="28.8" />
+    </g>
+  </g>
+
+  <!-- Small envelope indicator (bottom right) -->
+  <g transform="translate(35.2, 38.4)">
+    <rect x="0" y="0" width="22.4" height="16" fill="#3b82f6" rx="1.92"/>
+    <polyline points="0,0 11.2,7.68 22.4,0"
+              fill="none" stroke="white" stroke-width="1.92" stroke-linecap="round"/>
+  </g>
+</svg>

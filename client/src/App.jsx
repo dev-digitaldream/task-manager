@@ -9,19 +9,23 @@
 
 import './i18n'
 import React, { useState, useEffect } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
-import { Moon, Sun, Users, Download, FileText, Calendar, Settings, LogOut, Circle, RefreshCw, CheckCircle, Shield, Bell, X } from 'lucide-react'
-import TaskList from './components/TaskListClean'
-import Dashboard from './components/DashboardClean'
+import { Routes, Route, Navigate, Link } from 'react-router-dom'
+import { Moon, Sun, Users, Download, FileText, Calendar, Settings, LogOut, Circle, RefreshCw, CheckCircle, Shield, Bell, X, LayoutGrid, Upload } from 'lucide-react'
+import TaskList from './components/TaskList'
+import KanbanBoard from './components/KanbanBoard'
+import Dashboard from './components/Dashboard'
 import MeetingMode from './components/MeetingMode'
 import Analytics from './components/Analytics'
 import LoginForm from './components/LoginForm'
 import UserManagement from './components/UserManagement'
-import CalendarSubscription from './components/CalendarSubscription'
+import CalendarSubscription from './components/CalendarSubscriptionSimple'
 import AdminPanel from './components/AdminPanel'
 import UserSettings from './components/UserSettings'
 import UserProfile from './components/UserProfile'
-import IntegrationsSettings from './components/IntegrationsSettings'
+import IntegrationsSettings from './components/IntegrationsSettingsSimple'
+import TaskImport from './components/TaskImport'
+import ThemeSwitcher from './components/ThemeSwitcher'
+import LanguageSwitcher from './components/LanguageSwitcher'
 import { useSocket } from './hooks/useSocket'
 import { useTasks } from './hooks/useTasks'
 import { useUsers } from './hooks/useUsers'
@@ -36,6 +40,7 @@ function App() {
   const [showAdminPanel, setShowAdminPanel] = useState(false)
   const [showUserSettings, setShowUserSettings] = useState(false)
   const [showIntegrations, setShowIntegrations] = useState(false)
+  const [showImport, setShowImport] = useState(false)
 
   const { socket } = useSocket(currentUser?.id)
   const { tasks, createTask, updateTask, deleteTask, addComment, setTaskVisibility } = useTasks(socket)
@@ -198,6 +203,42 @@ function App() {
 
         <Route path="/analytics" element={<Analytics />} />
 
+        <Route path="/kanban" element={
+          currentUser ? (
+          <div className="container mx-auto px-4 py-6">
+            <header className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-6">
+                <Link to="/app" className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700" title="Vue Liste">
+                  <FileText size={20} className="text-gray-600 dark:text-gray-400" />
+                </Link>
+                <h1 className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
+                  Vue Kanban
+                </h1>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <ThemeSwitcher />
+                <LanguageSwitcher />
+                <UserProfile user={currentUser} onUpdate={(updated) => setCurrentUser({...currentUser, ...updated})} />
+              </div>
+            </header>
+
+            <KanbanBoard
+              tasks={tasks}
+              users={users}
+              currentUser={currentUser}
+              onCreateTask={createTask}
+              onUpdateTask={updateTask}
+              onDeleteTask={deleteTask}
+              onAddComment={addComment}
+              onSetVisibility={setTaskVisibility}
+            />
+          </div>
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        } />
+
         <Route path="/app" element={
           currentUser ? (
           <div className="container mx-auto px-4 py-6 max-w-4xl">
@@ -234,6 +275,17 @@ function App() {
               </div>
 
               <div className="flex items-center gap-2">
+                <Link to="/kanban" className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700" title="Vue Kanban">
+                  <LayoutGrid size={20} className="text-gray-600 dark:text-gray-400" />
+                </Link>
+
+                <button onClick={() => setShowImport(true)} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700" title="Importer des tâches">
+                  <Upload size={20} className="text-gray-600 dark:text-gray-400" />
+                </button>
+
+                <ThemeSwitcher />
+                <LanguageSwitcher />
+
                 <button onClick={() => setShowCalendarModal(true)} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700" title="Calendar">
                   <Calendar size={20} className="text-gray-600 dark:text-gray-400" />
                 </button>
@@ -327,19 +379,21 @@ function App() {
       )}
 
       {showIntegrations && currentUser && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Integrations</h2>
-                <button onClick={() => setShowIntegrations(false)} className="text-gray-500 hover:text-gray-700">
-                  <X size={24} />
-                </button>
-              </div>
-              <IntegrationsSettings userId={currentUser.id} onIntegrationChange={() => {}} />
-            </div>
-          </div>
-        </div>
+        <IntegrationsSettings
+          userId={currentUser.id}
+          onClose={() => setShowIntegrations(false)}
+        />
+      )}
+
+      {showImport && currentUser && (
+        <TaskImport
+          currentUser={currentUser}
+          onImport={() => {
+            setShowImport(false)
+            // Tasks will auto-refresh via socket
+          }}
+          onClose={() => setShowImport(false)}
+        />
       )}
     </div>
   )

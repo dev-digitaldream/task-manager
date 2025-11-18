@@ -20,7 +20,11 @@ export function usePublicTasks(socket) {
   }, [fetchPublicTasks])
 
   useEffect(() => {
-    if (!socket || typeof socket.on !== 'function') return
+    if (!socket) return
+    if (typeof socket.on !== 'function') {
+      console.warn('Socket object does not have .on method')
+      return
+    }
 
     const handlePublicTasksUpdated = () => {
       fetchPublicTasks()
@@ -29,7 +33,9 @@ export function usePublicTasks(socket) {
     socket.on('tasks:public_updated', handlePublicTasksUpdated)
 
     return () => {
-      socket.off('tasks:public_updated', handlePublicTasksUpdated)
+      if (socket && typeof socket.off === 'function') {
+        socket.off('tasks:public_updated', handlePublicTasksUpdated)
+      }
     }
   }, [socket, fetchPublicTasks])
 

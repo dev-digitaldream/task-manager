@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support - Task Manager Outlook Add-in</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8fafc;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #0f172a;
+            margin-bottom: 20px;
+            font-size: 32px;
+        }
+        h2 {
+            color: #1e293b;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+        p {
+            margin-bottom: 15px;
+            color: #475569;
+        }
+        ul {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+        li {
+            margin-bottom: 8px;
+            color: #475569;
+        }
+        .contact-box {
+            background: #f1f5f9;
+            border-left: 4px solid #3b82f6;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .faq-item {
+            background: #f8fafc;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        .faq-question {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+        .faq-answer {
+            color: #475569;
+        }
+        a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📞 Support - Task Manager</h1>
+        <p>
+            Welcome to the Task Manager Outlook Add-in support page. We're here to help you get the most
+            out of our add-in and resolve any issues you might encounter.
+        </p>
+
+        <div class="contact-box">
+            <h3>Contact Support</h3>
+            <p>
+                📧 Email: <a href="mailto:support@digitaldream.work">support@digitaldream.work</a><br>
+                🌐 Website: <a href="https://task-manager.digitaldream.work">https://task-manager.digitaldream.work</a><br>
+                ⏰ Response time: Within 24 hours (business days)
+            </p>
+        </div>
+
+        <h2>📚 Frequently Asked Questions</h2>
+
+        <div class="faq-item">
+            <div class="faq-question">How do I install the add-in?</div>
+            <div class="faq-answer">
+                1. Open Outlook on the web (outlook.office.com)<br>
+                2. Click Settings (⚙️) → View all Outlook settings<br>
+                3. Go to General → Manage add-ins<br>
+                4. Click "+ Add a custom add-in" → "Add from URL"<br>
+                5. Enter: <code>https://task-manager.digitaldream.work/outlook/manifest.json</code><br>
+                6. Click Install
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">The add-in doesn't appear in Outlook</div>
+            <div class="faq-answer">
+                Try these steps:<br>
+                • Refresh your browser (or restart Outlook Desktop)<br>
+                • Clear your browser cache<br>
+                • Verify the add-in is installed in Settings → Manage Add-ins<br>
+                • Try using the JSON manifest instead of XML<br>
+                • Check if you're using a supported Outlook version
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">I get "CORS error" when creating tasks</div>
+            <div class="faq-answer">
+                This usually means:<br>
+                • The server is not configured to accept requests from Outlook domains<br>
+                • Your network/firewall is blocking the connection<br>
+                • Try accessing the main app at <a href="https://task-manager.digitaldream.work">task-manager.digitaldream.work</a> first<br>
+                • Contact your IT administrator if you're in a corporate environment
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">Users don't appear in the dropdown</div>
+            <div class="faq-answer">
+                Make sure:<br>
+                • You have users created in the main Task Manager app<br>
+                • You're connected to the internet<br>
+                • The API endpoint is accessible (check browser console F12)<br>
+                • CORS is properly configured on the server
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">Can I use this on Outlook mobile?</div>
+            <div class="faq-answer">
+                The JSON manifest supports Outlook mobile, but the experience may be limited.
+                We recommend using Outlook Web or Desktop for the best experience.
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">Is my email data stored on your servers?</div>
+            <div class="faq-answer">
+                No. We only store the task information you explicitly create. We do not access,
+                read, or store your email content beyond what you choose to include in task notes.
+                See our <a href="/privacy.html">Privacy Policy</a> for details.
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">How do I uninstall the add-in?</div>
+            <div class="faq-answer">
+                1. Open Outlook settings<br>
+                2. Go to General → Manage add-ins<br>
+                3. Find "Task Manager" in the list<br>
+                4. Click the trash/delete icon<br>
+                5. Confirm removal
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">What permissions does the add-in need?</div>
+            <div class="faq-answer">
+                The add-in requires <code>MailboxItem.Read.User</code> permission to:<br>
+                • Read the subject of the current email<br>
+                • Read the sender information<br>
+                • Read the email body (only when you create a task)<br>
+                <br>
+                We do NOT access any other emails or your contacts.
+            </div>
+        </div>
+
+        <h2>🔧 Troubleshooting Steps</h2>
+
+        <h3>1. Check Add-in Status</h3>
+        <ul>
+            <li>Open Outlook settings → Manage add-ins</li>
+            <li>Verify "Task Manager" is listed and enabled</li>
+            <li>Check if there are any error messages</li>
+        </ul>
+
+        <h3>2. Clear Cache</h3>
+        <ul>
+            <li><strong>Outlook Web</strong>: Clear browser cache (Ctrl+Shift+Delete)</li>
+            <li><strong>Outlook Desktop</strong>: Close and restart Outlook</li>
+            <li>Re-login to Outlook</li>
+        </ul>
+
+        <h3>3. Check Browser Console</h3>
+        <ul>
+            <li>When the add-in is open, press F12</li>
+            <li>Go to the Console tab</li>
+            <li>Look for error messages (red text)</li>
+            <li>Send us the error message for faster support</li>
+        </ul>
+
+        <h3>4. Verify Connectivity</h3>
+        <ul>
+            <li>Open <a href="https://task-manager.digitaldream.work">https://task-manager.digitaldream.work</a> in your browser</li>
+            <li>Verify you can access the main app</li>
+            <li>Try creating a task in the main app</li>
+        </ul>
+
+        <h2>🆘 Getting Help</h2>
+        <p>When contacting support, please include:</p>
+        <ul>
+            <li>Your Outlook version (Web/Desktop/Mobile)</li>
+            <li>Operating system and browser (if using Outlook Web)</li>
+            <li>Description of the issue</li>
+            <li>Steps to reproduce the problem</li>
+            <li>Screenshots (if applicable)</li>
+            <li>Any error messages from browser console</li>
+        </ul>
+
+        <h2>📖 Documentation</h2>
+        <ul>
+            <li><a href="/privacy.html">Privacy Policy</a></li>
+            <li><a href="/terms.html">Terms of Use</a></li>
+            <li><a href="https://docs.microsoft.com/outlook/add-ins/">Microsoft Outlook Add-ins Documentation</a></li>
+        </ul>
+
+        <h2>🔄 Updates and Announcements</h2>
+        <p>
+            We regularly update the add-in with new features and improvements. Updates are applied
+            automatically - you don't need to reinstall the add-in.
+        </p>
+
+        <h2>✨ Feature Requests</h2>
+        <p>
+            Have an idea for a new feature? We'd love to hear from you! Send your suggestions to
+            <a href="mailto:support@digitaldream.work">support@digitaldream.work</a>
+        </p>
+    </div>
+</body>
+</html>

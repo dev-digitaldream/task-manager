@@ -74,6 +74,7 @@ pm2-*.log
 # Sensitive data
 secrets/
 credentials/
+deploy-caprover-auto.sh
 
 # Archives and old backups
 *.tar.gz

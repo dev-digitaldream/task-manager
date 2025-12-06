@@ -64,8 +64,27 @@ app.use((req, res, next) => {
   next();
 });
 
+// Set correct MIME types for static assets
+app.use((req, res, next) => {
+  if (req.path.endsWith('.css')) {
+    res.setHeader('Content-Type', 'text/css');
+  } else if (req.path.endsWith('.js')) {
+    res.setHeader('Content-Type', 'application/javascript');
+  } else if (req.path.endsWith('.json')) {
+    res.setHeader('Content-Type', 'application/json');
+  } else if (req.path.endsWith('.svg')) {
+    res.setHeader('Content-Type', 'image/svg+xml');
+  } else if (req.path.endsWith('.png')) {
+    res.setHeader('Content-Type', 'image/png');
+  }
+  next();
+});
+
 // Serve static files from the React app build
 app.use(express.static(path.join(__dirname, '../public')));
+
+// Serve uploaded files (avatars, etc.)
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Serve Outlook Add-in files
 app.use('/outlook', express.static(path.join(__dirname, '../../outlook-addin')));
@@ -78,6 +97,8 @@ app.use('/api/admin', require('./routes/admin'));
 app.use('/api/attachments', require('./routes/attachments'));
 app.use('/api/integrations', require('./routes/integrations'));
 app.use('/api', require('./routes/ical'));
+app.use('/api/expenses', require('./routes/expenses'));
+app.use('/api/todos', require('./routes/todos'));
 
 // Health check
 app.get('/health', (req, res) => {

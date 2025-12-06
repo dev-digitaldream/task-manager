@@ -3,27 +3,37 @@ import {
   X,
   AlertCircle,
   Download,
-  Upload
+  Upload,
+  Loader2,
+  Mail,
+  Calendar,
+  CheckSquare
 } from 'lucide-react'
 
 const INTEGRATION_TYPES = {
   ical: {
     name: 'iCal / CalDAV',
-    description: 'Synchronisez vos tâches avec Apple Calendar, Google Calendar, ou tout client CalDAV',
+    description: 'Synchronisez vos tâches avec Apple Calendar, ou tout client compatible iCal.',
     color: 'bg-blue-500',
-    icon: '📅'
+    icon: <Calendar className="w-8 h-8 text-blue-600" />
   },
   reminders: {
     name: 'Apple Rappels',
-    description: 'Exportez vos tâches vers l\'app Rappels (macOS/iOS)',
+    description: 'Exportez vos tâches vers l\'app Rappels (macOS/iOS).',
     color: 'bg-purple-500',
-    icon: '✅'
+    icon: <CheckSquare className="w-8 h-8 text-purple-600" />
   },
   gcal: {
     name: 'Google Calendar',
-    description: 'Synchronisation avec Google Calendar via API',
+    description: 'Ajoutez vos tâches comme un agenda Google Calendar.',
     color: 'bg-red-500',
-    icon: '📆'
+    icon: <Calendar className="w-8 h-8 text-red-600" />
+  },
+  outlook: {
+    name: 'Microsoft Outlook',
+    description: 'Add-in pour transformer vos emails en tâches.',
+    color: 'bg-cyan-600',
+    icon: <Mail className="w-8 h-8 text-cyan-600" />
   }
 }
 
@@ -71,15 +81,14 @@ const IntegrationsSettingsSimple = ({ userId, onClose }) => {
     }
   }
 
-  const handleExportReminders = async () => {
-    // Même chose que iCal, compatible avec Apple Rappels
-    await handleExportICal()
+  const handleDownloadManifest = () => {
+    window.open('/api/integrations/outlook/manifest', '_blank');
   }
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white dark:bg-gray-800 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-auto shadow-2xl">
-        <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-6 flex items-center justify-between">
+        <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-6 flex items-center justify-between z-10">
           <div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Intégrations</h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
@@ -94,11 +103,14 @@ const IntegrationsSettingsSimple = ({ userId, onClose }) => {
           </button>
         </div>
 
-        <div className="p-6 space-y-4">
+        <div className="p-6 space-y-6">
+
           {/* iCal / CalDAV */}
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border border-blue-200 dark:border-blue-700 rounded-lg p-6">
+          <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-6">
             <div className="flex items-start gap-4">
-              <div className="text-4xl">{INTEGRATION_TYPES.ical.icon}</div>
+              <div className="p-3 bg-white dark:bg-slate-800 rounded-lg shadow-sm">
+                {INTEGRATION_TYPES.ical.icon}
+              </div>
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
                   {INTEGRATION_TYPES.ical.name}
@@ -111,27 +123,27 @@ const IntegrationsSettingsSimple = ({ userId, onClose }) => {
                   <button
                     onClick={handleExportICal}
                     disabled={loading}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50"
+                    className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg transition-colors disabled:opacity-50 font-medium"
                   >
                     {loading ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
-                    Exporter (.ics)
+                    Télécharger .ics
                   </button>
 
                   <button
                     onClick={handleSubscribeICal}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium"
                   >
                     <Upload size={16} />
-                    URL d'abonnement
+                    Copier lien d'abonnement
                   </button>
                 </div>
 
                 {exportUrl && (
-                  <div className="mt-3 p-3 bg-white dark:bg-gray-900 rounded border border-blue-200 dark:border-blue-700">
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
-                      URL d'abonnement (copiée dans le presse-papier):
+                  <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded border border-blue-200 dark:border-blue-800">
+                    <p className="text-xs text-blue-800 dark:text-blue-300 mb-1 font-medium">
+                      Lien copié ! Ajoutez ce lien dans votre application calendrier :
                     </p>
-                    <code className="text-xs text-blue-600 dark:text-blue-400 break-all">
+                    <code className="text-xs text-blue-600 dark:text-blue-400 break-all block bg-white dark:bg-slate-900 p-2 rounded border border-blue-100 dark:border-blue-900">
                       {exportUrl}
                     </code>
                   </div>
@@ -140,10 +152,41 @@ const IntegrationsSettingsSimple = ({ userId, onClose }) => {
             </div>
           </div>
 
-          {/* Apple Rappels */}
-          <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 border border-purple-200 dark:border-purple-700 rounded-lg p-6">
+          {/* Google Calendar */}
+          <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-6">
             <div className="flex items-start gap-4">
-              <div className="text-4xl">{INTEGRATION_TYPES.reminders.icon}</div>
+              <div className="p-3 bg-white dark:bg-slate-800 rounded-lg shadow-sm">
+                {INTEGRATION_TYPES.gcal.icon}
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                  {INTEGRATION_TYPES.gcal.name}
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                  {INTEGRATION_TYPES.gcal.description}
+                </p>
+
+                <button
+                  onClick={handleSubscribeICal}
+                  className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg transition-colors font-medium"
+                >
+                  <Upload size={16} />
+                  Obtenir l'URL pour Google Agenda
+                </button>
+
+                <p className="text-xs text-slate-500 mt-2">
+                  Dans Google Agenda : Paramètres {'>'} Ajouter un agenda {'>'} À partir de l'URL
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Apple Rappels */}
+          <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-6">
+            <div className="flex items-start gap-4">
+              <div className="p-3 bg-white dark:bg-slate-800 rounded-lg shadow-sm">
+                {INTEGRATION_TYPES.reminders.icon}
+              </div>
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
                   {INTEGRATION_TYPES.reminders.name}
@@ -153,50 +196,51 @@ const IntegrationsSettingsSimple = ({ userId, onClose }) => {
                 </p>
 
                 <button
-                  onClick={handleExportReminders}
+                  onClick={handleExportICal}
                   disabled={loading}
-                  className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors disabled:opacity-50"
+                  className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg transition-colors disabled:opacity-50 font-medium"
                 >
                   {loading ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
-                  Exporter vers Rappels
+                  Exporter pour Rappels
+                </button>
+                <p className="text-xs text-slate-500 mt-2">
+                  Ouvrez le fichier téléchargé sur votre Mac ou iPhone pour l'importer dans Rappels.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Outlook Add-in */}
+          <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-6">
+            <div className="flex items-start gap-4">
+              <div className="p-3 bg-white dark:bg-slate-800 rounded-lg shadow-sm">
+                {INTEGRATION_TYPES.outlook.icon}
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                  {INTEGRATION_TYPES.outlook.name}
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                  {INTEGRATION_TYPES.outlook.description}
+                </p>
+
+                <button
+                  onClick={handleDownloadManifest}
+                  className="flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg transition-colors font-medium"
+                >
+                  <Download size={16} />
+                  Télécharger le Manifeste (XML)
                 </button>
 
-                <div className="mt-3 p-3 bg-purple-50 dark:bg-purple-900/30 rounded border border-purple-200 dark:border-purple-700">
-                  <p className="text-xs text-gray-600 dark:text-gray-400">
-                    <strong>Instructions:</strong> Après export, ouvrez le fichier .ics sur macOS/iOS.
-                    Il sera automatiquement importé dans l'app Rappels.
+                <div className="mt-3 p-3 bg-cyan-50 dark:bg-cyan-900/20 rounded border border-cyan-100 dark:border-cyan-900">
+                  <p className="text-xs text-cyan-800 dark:text-cyan-300">
+                    <strong>Installation :</strong> Dans Outlook Web, allez dans "Gérer les compléments" {'>'} "Mes compléments" {'>'} "Ajouter un complément personnalisé" {'>'} "Ajouter à partir d'un fichier".
                   </p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Google Calendar (à venir) */}
-          <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/20 dark:to-gray-800/20 border border-gray-200 dark:border-gray-700 rounded-lg p-6 opacity-60">
-            <div className="flex items-start gap-4">
-              <div className="text-4xl">{INTEGRATION_TYPES.gcal.icon}</div>
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                  {INTEGRATION_TYPES.gcal.name}
-                  <span className="ml-2 text-xs bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded">
-                    Bientôt
-                  </span>
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  {INTEGRATION_TYPES.gcal.description}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="sticky bottom-0 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 p-4">
-          <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-            <AlertCircle size={14} />
-            <p>
-              Les fichiers .ics sont compatibles avec Apple Calendar, Google Calendar, Outlook, Thunderbird, et la plupart des clients calendrier/rappels.
-            </p>
-          </div>
         </div>
       </div>
     </div>

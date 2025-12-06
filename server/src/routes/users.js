@@ -1,8 +1,87 @@
 const express = require('express');
 const { PrismaClient } = require('@prisma/client');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+const sharp = require('sharp');
 
 const router = express.Router();
 const prisma = new PrismaClient();
+
+// Configure multer pour stocker temporairement en mémoire
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB max (sera réduit après traitement)
+  },
+  fileFilter: (req, file, cb) => {
+    // Accepter uniquement les images
+    const allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/jpg'];
+    if (allowedMimes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Format non supporté. Utilisez JPG, PNG, GIF ou WebP.'));
+    }
+  }
+});
+
+// POST /api/users/:id/avatar - Upload avatar avec redimensionnement
+router.post('/:id/avatar', upload.single('avatar'), async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!req.file) {
+      return res.status(400).json({ error: 'Aucun fichier uploadé' });
+    }
+
+    // Créer le dossier uploads s'il n'existe pas
+    const uploadDir = path.join(__dirname, '../../uploads');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+
+    // Générer un nom de fichier unique
+    const filename = `avatar-${id}-${Date.now()}.webp`;
+    const filepath = path.join(uploadDir, filename);
+
+    // Redimensionner et optimiser l'image avec sharp
+    await sharp(req.file.buffer)
+      .resize(200, 200, {
+        fit: 'cover',           // Recadrer pour remplir 200x200
+        position: 'center'      // Centrer le recadrage
+      })
+      .webp({ quality: 90 })    // Convertir en WebP avec qualité 90%
+      .toFile(filepath);
+
+    const avatarUrl = `/uploads/${filename}`;
+
+    // Supprimer l'ancien avatar s'il existe (sauf si c'est un emoji)
+    const oldUser = await prisma.user.findUnique({ where: { id }, select: { avatar: true } });
+    if (oldUser?.avatar && oldUser.avatar.startsWith('/uploads/')) {
+      const oldPath = path.join(__dirname, '../..', oldUser.avatar);
+      if (fs.existsSync(oldPath)) {
+        fs.unlinkSync(oldPath);
+      }
+    }
+
+    // Mettre à jour l'utilisateur
+    const user = await prisma.user.update({
+      where: { id },
+      data: { avatar: avatarUrl },
+      select: {
+        id: true,
+        name: true,
+        avatar: true,
+        email: true
+      }
+    });
+
+    res.json(user);
+  } catch (error) {
+    console.error('Erreur upload avatar:', error);
+    res.status(500).json({ error: 'Échec de l\'upload de l\'avatar' });
+  }
+});
 
 // GET /api/users
 router.get('/', async (req, res) => {

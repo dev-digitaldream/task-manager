@@ -1,309 +1,177 @@
-import React, { useState, useMemo } from 'react'
-import {
-  DndContext,
-  DragOverlay,
-  closestCorners,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core'
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable'
-import { Plus, Filter } from 'lucide-react'
-import KanbanColumn from './KanbanColumn'
-import KanbanCard from './KanbanCard'
-import TaskForm from './TaskForm'
+import React from 'react';
+import { MoreHorizontal, Plus, Calendar, Clock, AlertCircle } from 'lucide-react';
 
-const KanbanBoard = ({
-  tasks,
-  users,
-  currentUser,
-  onCreateTask,
-  onUpdateTask,
-  onDeleteTask,
-  onAddComment,
-  onSetVisibility
-}) => {
-  const [activeId, setActiveId] = useState(null)
-  const [showForm, setShowForm] = useState(false)
-  const [filterPriority, setFilterPriority] = useState('all')
-  const [filterAssignee, setFilterAssignee] = useState('all')
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    }),
-    useSensor(KeyboardSensor)
-  )
-
-  const columns = {
-    todo: { id: 'todo', title: 'À faire', color: 'bg-gray-100 dark:bg-gray-800' },
-    doing: { id: 'doing', title: 'En cours', color: 'bg-blue-100 dark:bg-blue-900/20' },
-    done: { id: 'done', title: 'Terminé', color: 'bg-green-100 dark:bg-green-900/20' }
-  }
-
-  // Filter tasks
-  const filteredTasks = useMemo(() => {
-    return tasks.filter(task => {
-      const matchesPriority = filterPriority === 'all' || task.priority === filterPriority
-      const matchesAssignee = filterAssignee === 'all' || task.assigneeId === parseInt(filterAssignee)
-      return matchesPriority && matchesAssignee
-    })
-  }, [tasks, filterPriority, filterAssignee])
-
-  // Group tasks by status
-  const tasksByStatus = useMemo(() => {
-    const grouped = {
-      todo: [],
-      doing: [],
-      done: []
-    }
-
-    filteredTasks.forEach(task => {
-      if (grouped[task.status]) {
-        grouped[task.status].push(task)
-      }
-    })
-
-    // Sort by priority and due date
-    Object.keys(grouped).forEach(status => {
-      grouped[status].sort((a, b) => {
-        const priorityOrder = { urgent: 0, high: 1, medium: 2, low: 3 }
-        const priorityDiff = (priorityOrder[a.priority] || 2) - (priorityOrder[b.priority] || 2)
-        if (priorityDiff !== 0) return priorityDiff
-
-        if (a.dueDate && b.dueDate) {
-          return new Date(a.dueDate) - new Date(b.dueDate)
-        }
-        if (a.dueDate) return -1
-        if (b.dueDate) return 1
-
-        return new Date(b.createdAt) - new Date(a.createdAt)
-      })
-    })
-
-    return grouped
-  }, [filteredTasks])
-
-  const handleDragStart = (event) => {
-    setActiveId(event.active.id)
-  }
-
-  const handleDragOver = (event) => {
-    const { active, over } = event
-
-    if (!over) return
-
-    const activeTask = tasks.find(t => t.id === active.id)
-    if (!activeTask) return
-
-    // Get the column ID from the over item (either a column or another task)
-    let newStatus = null
-
-    if (over.id === 'todo' || over.id === 'doing' || over.id === 'done') {
-      // Dropped directly on column
-      newStatus = over.id
-    } else {
-      // Dropped on a task, get that task's status
-      const overTask = tasks.find(t => t.id === over.id)
-      if (overTask) {
-        newStatus = overTask.status
-      }
-    }
-
-    if (newStatus && activeTask.status !== newStatus) {
-      onUpdateTask(activeTask.id, { status: newStatus })
-    }
-  }
-
-  const handleDragEnd = () => {
-    setActiveId(null)
-  }
-
-  const handleCreateTask = async (taskData) => {
-    try {
-      await onCreateTask({
-        ...taskData,
-        ownerId: currentUser?.id,
-        status: 'todo' // New tasks default to todo column
-      })
-      setShowForm(false)
-    } catch (error) {
-      console.error('Failed to create task:', error)
-    }
-  }
-
-  const activeTask = activeId ? tasks.find(t => t.id === activeId) : null
-
-  const getCounts = () => {
-    return {
-      todo: tasksByStatus.todo.length,
-      doing: tasksByStatus.doing.length,
-      done: tasksByStatus.done.length
-    }
-  }
-
-  const counts = getCounts()
-
+const KanbanColumn = ({ title, status, tasks, onTaskClick, onStatusChange, color }) => {
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
-            Tableau Kanban
-          </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Glissez-déposez les cartes pour changer leur statut
-          </p>
+    <div className="flex-1 min-w-[300px] bg-slate-50 rounded-xl p-4 flex flex-col h-full max-h-full">
+      {/* Column Header */}
+      <div className="flex items-center justify-between mb-4 px-2">
+        <div className="flex items-center gap-2">
+          <div className={`w-3 h-3 rounded-full ${color}`} />
+          <h3 className="font-bold text-slate-700">{title}</h3>
+          <span className="bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full text-xs font-bold">
+            {tasks.length}
+          </span>
         </div>
-
-        <button
-          onClick={() => setShowForm(true)}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
-        >
-          <Plus size={20} />
-          Nouvelle tâche
+        <button className="p-1 hover:bg-slate-200 rounded transition">
+          <MoreHorizontal className="w-4 h-4 text-slate-500" />
         </button>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-3 items-center bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-        <div className="flex items-center gap-2">
-          <Filter size={18} className="text-gray-500" />
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Filtres:</span>
-        </div>
-
-        <select
-          value={filterPriority}
-          onChange={(e) => setFilterPriority(e.target.value)}
-          className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="all">Toutes priorités</option>
-          <option value="low">Basse</option>
-          <option value="medium">Moyenne</option>
-          <option value="high">Haute</option>
-          <option value="urgent">Urgente</option>
-        </select>
-
-        <select
-          value={filterAssignee}
-          onChange={(e) => setFilterAssignee(e.target.value)}
-          className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="all">Tous les assignés</option>
-          {users.map(user => (
-            <option key={user.id} value={user.id}>
-              {user.avatar} {user.name}
-            </option>
-          ))}
-        </select>
-
-        <div className="ml-auto text-sm text-gray-600 dark:text-gray-400">
-          {filteredTasks.length} tâche{filteredTasks.length !== 1 ? 's' : ''}
-        </div>
-      </div>
-
-      {/* Task Form Modal */}
-      {showForm && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-auto p-6">
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              Nouvelle tâche
-            </h3>
-            <TaskForm
-              users={users}
-              onSubmit={handleCreateTask}
-              onCancel={() => setShowForm(false)}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Kanban Board */}
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCorners}
-        onDragStart={handleDragStart}
-        onDragOver={handleDragOver}
-        onDragEnd={handleDragEnd}
-      >
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {Object.values(columns).map((column) => (
-            <KanbanColumn
-              key={column.id}
-              id={column.id}
-              title={column.title}
-              color={column.color}
-              count={counts[column.id]}
-              tasks={tasksByStatus[column.id]}
-              users={users}
-              currentUser={currentUser}
-              onUpdateTask={onUpdateTask}
-              onDeleteTask={onDeleteTask}
-              onAddComment={onAddComment}
-              onSetVisibility={onSetVisibility}
-            />
-          ))}
-        </div>
-
-        <DragOverlay>
-          {activeTask ? (
-            <div className="opacity-90 rotate-3 transform scale-105">
-              <KanbanCard
-                task={activeTask}
-                users={users}
-                currentUser={currentUser}
-                isDragging
-              />
-            </div>
-          ) : null}
-        </DragOverlay>
-      </DndContext>
-
-      {/* Stats */}
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="text-center">
-            <div className="text-3xl font-bold text-gray-900 dark:text-white">{counts.todo}</div>
-            <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">À faire</div>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{counts.doing}</div>
-            <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">En cours</div>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl font-bold text-green-600 dark:text-green-400">{counts.done}</div>
-            <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Terminées</div>
-          </div>
-        </div>
-
-        {counts.todo + counts.doing + counts.done > 0 && (
-          <div className="mt-4">
-            <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
-              <span>Progression</span>
-              <span className="font-semibold">
-                {Math.round((counts.done / (counts.todo + counts.doing + counts.done)) * 100)}%
-              </span>
-            </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+      {/* Tasks List */}
+      <div className="flex-1 overflow-y-auto space-y-3 pr-1">
+        {tasks.map((task) => (
+          <div
+            key={task.id}
+            onClick={() => onTaskClick(task)}
+            className="bg-white p-4 rounded-lg shadow-sm border border-slate-200 hover:shadow-md transition cursor-pointer group relative overflow-hidden"
+          >
+            {/* Color Bar */}
+            {task.color && (
               <div
-                className="bg-gradient-to-r from-green-500 to-green-600 h-2 rounded-full transition-all duration-500"
-                style={{
-                  width: `${(counts.done / (counts.todo + counts.doing + counts.done)) * 100}%`
-                }}
-              ></div>
+                className="absolute top-0 left-0 w-1 h-full"
+                style={{ backgroundColor: task.color }}
+              />
+            )}
+
+            {/* Header: Icon & Priority */}
+            <div className="flex items-start justify-between mb-2 pl-2">
+              <div className="flex items-center gap-2">
+                {task.icon && (
+                  <span className="material-icons text-slate-500 text-lg">
+                    {task.icon}
+                  </span>
+                )}
+                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${task.priority === 'urgent' ? 'bg-red-100 text-red-700' :
+                    task.priority === 'high' ? 'bg-orange-100 text-orange-700' :
+                      task.priority === 'medium' ? 'bg-blue-100 text-blue-700' :
+                        'bg-slate-100 text-slate-600'
+                  }`}>
+                  {task.priority === 'urgent' ? 'Urgent' :
+                    task.priority === 'high' ? 'Haute' :
+                      task.priority === 'medium' ? 'Moyenne' : 'Basse'}
+                </span>
+              </div>
             </div>
+
+            {/* Title */}
+            <h4 className="font-semibold text-slate-900 mb-2 pl-2 line-clamp-2">
+              {task.title}
+            </h4>
+
+            {/* Dates */}
+            {(task.startDate || task.dueDate) && (
+              <div className="flex items-center gap-3 mb-3 pl-2 text-xs text-slate-500">
+                {task.startDate && (
+                  <div className="flex items-center gap-1" title="Date de début">
+                    <Calendar className="w-3 h-3" />
+                    <span>{new Date(task.startDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}</span>
+                  </div>
+                )}
+                {task.dueDate && (
+                  <div className={`flex items-center gap-1 ${new Date(task.dueDate) < new Date() && task.status !== 'done'
+                      ? 'text-red-600 font-bold'
+                      : ''
+                    }`} title="Date d'échéance">
+                    <Clock className="w-3 h-3" />
+                    <span>{new Date(task.dueDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Footer: Avatar & Actions */}
+            <div className="flex items-center justify-between pl-2 mt-2 pt-2 border-t border-slate-50">
+              <div className="flex items-center gap-2">
+                {task.assignee ? (
+                  <div className="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center text-xs font-bold text-indigo-700" title={task.assignee.name}>
+                    {task.assignee.avatar || task.assignee.name.charAt(0)}
+                  </div>
+                ) : (
+                  <div className="w-6 h-6 bg-slate-100 rounded-full flex items-center justify-center text-xs text-slate-400 border border-dashed border-slate-300">
+                    ?
+                  </div>
+                )}
+              </div>
+
+              {/* Quick Move Actions (visible on hover) */}
+              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                {status !== 'todo' && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onStatusChange(task.id, 'todo'); }}
+                    className="p-1 hover:bg-slate-100 rounded text-[10px] font-bold text-slate-500"
+                    title="Déplacer vers À faire"
+                  >
+                    ←
+                  </button>
+                )}
+                {status !== 'doing' && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onStatusChange(task.id, 'doing'); }}
+                    className="p-1 hover:bg-slate-100 rounded text-[10px] font-bold text-blue-500"
+                    title="Déplacer vers En cours"
+                  >
+                    {status === 'todo' ? '→' : '←'}
+                  </button>
+                )}
+                {status !== 'done' && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onStatusChange(task.id, 'done'); }}
+                    className="p-1 hover:bg-slate-100 rounded text-[10px] font-bold text-emerald-500"
+                    title="Déplacer vers Terminé"
+                  >
+                    →
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {/* Empty State */}
+        {tasks.length === 0 && (
+          <div className="text-center py-8 border-2 border-dashed border-slate-200 rounded-lg">
+            <p className="text-sm text-slate-400">Aucune tâche</p>
           </div>
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default KanbanBoard
+const KanbanBoard = ({ tasks, onTaskClick, onStatusChange }) => {
+  const todoTasks = tasks.filter(t => t.status === 'todo');
+  const doingTasks = tasks.filter(t => t.status === 'doing');
+  const doneTasks = tasks.filter(t => t.status === 'done');
+
+  return (
+    <div className="flex gap-6 h-full overflow-x-auto pb-4">
+      <KanbanColumn
+        title="À faire"
+        status="todo"
+        tasks={todoTasks}
+        onTaskClick={onTaskClick}
+        onStatusChange={onStatusChange}
+        color="bg-slate-400"
+      />
+      <KanbanColumn
+        title="En cours"
+        status="doing"
+        tasks={doingTasks}
+        onTaskClick={onTaskClick}
+        onStatusChange={onStatusChange}
+        color="bg-blue-500"
+      />
+      <KanbanColumn
+        title="Terminé"
+        status="done"
+        tasks={doneTasks}
+        onTaskClick={onTaskClick}
+        onStatusChange={onStatusChange}
+        color="bg-emerald-500"
+      />
+    </div>
+  );
+};
+
+export default KanbanBoard;

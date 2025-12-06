@@ -10,7 +10,7 @@
 import './i18n'
 import React, { useState, useEffect } from 'react'
 import { Routes, Route, Navigate, Link } from 'react-router-dom'
-import { Moon, Sun, Users, Download, FileText, Calendar, Settings, LogOut, Circle, RefreshCw, CheckCircle, Shield, Bell, X, LayoutGrid, Upload } from 'lucide-react'
+import { Moon, Sun, Users, Download, FileText, Calendar, Settings, LogOut, Circle, RefreshCw, CheckCircle, Shield, Bell, X, LayoutGrid, Upload, Sparkles } from 'lucide-react'
 import TaskList from './components/TaskList'
 import KanbanBoard from './components/KanbanBoard'
 import Dashboard from './components/Dashboard'
@@ -26,6 +26,14 @@ import IntegrationsSettings from './components/IntegrationsSettingsSimple'
 import TaskImport from './components/TaskImport'
 import ThemeSwitcher from './components/ThemeSwitcher'
 import LanguageSwitcher from './components/LanguageSwitcher'
+import ModernDashboard from './components/ModernDashboard'
+import ExpensesPage from './components/ExpensesPage'
+import MyPagesPage from './components/MyPagesPage'
+import DraftsPage from './components/DraftsPage'
+import ProfilePage from './components/ProfilePage'
+import DashboardPage from './components/DashboardPage'
+import TeamPage from './components/TeamPage'
+import WikiPage from './components/WikiPage'
 import { useSocket } from './hooks/useSocket'
 import { useTasks } from './hooks/useTasks'
 import { useUsers } from './hooks/useUsers'
@@ -195,7 +203,7 @@ function App() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
       <Routes>
         {/* Default: redirect to public dashboard */}
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/" element={<Navigate to="/modern" replace />} />
 
         <Route path="/dashboard" element={<Dashboard />} />
 
@@ -203,148 +211,119 @@ function App() {
 
         <Route path="/analytics" element={<Analytics />} />
 
+        <Route path="/modern" element={
+          currentUser ? (
+            <ModernDashboard currentUser={currentUser} />
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        } />
+
+        <Route path="/expenses" element={
+          currentUser ? (
+            <ExpensesPage currentUser={currentUser} />
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        } />
+
+        <Route path="/my-pages" element={
+          currentUser ? (
+            <MyPagesPage currentUser={currentUser} />
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        } />
+
+        <Route path="/drafts" element={
+          currentUser ? (
+            <DraftsPage currentUser={currentUser} />
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        } />
+
+        <Route path="/profile" element={
+          currentUser ? (
+            <ProfilePage
+              currentUser={currentUser}
+              onLogout={handleLogout}
+              onUpdate={(updated) => setCurrentUser({ ...currentUser, ...updated })}
+            />
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        } />
+
+        <Route path="/dashboard-general" element={
+          currentUser ? (
+            <DashboardPage currentUser={currentUser} />
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        } />
+
+        <Route path="/team" element={
+          currentUser ? (
+            <TeamPage currentUser={currentUser} />
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        } />
+
+        <Route path="/wiki" element={
+          currentUser ? (
+            <WikiPage currentUser={currentUser} />
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        } />
+
         <Route path="/kanban" element={
           currentUser ? (
-          <div className="container mx-auto px-4 py-6">
-            <header className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-6">
-                <Link to="/app" className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700" title="Vue Liste">
-                  <FileText size={20} className="text-gray-600 dark:text-gray-400" />
-                </Link>
-                <h1 className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
-                  Vue Kanban
-                </h1>
-              </div>
+            <div className="container mx-auto px-4 py-6">
+              <header className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-6">
+                  <Link to="/app" className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700" title="Vue Liste">
+                    <FileText size={20} className="text-gray-600 dark:text-gray-400" />
+                  </Link>
+                  <h1 className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
+                    Vue Kanban
+                  </h1>
+                </div>
 
-              <div className="flex items-center gap-2">
-                <ThemeSwitcher />
-                <LanguageSwitcher />
-                <UserProfile user={currentUser} onUpdate={(updated) => setCurrentUser({...currentUser, ...updated})} />
-              </div>
-            </header>
-
-            <KanbanBoard
-              tasks={tasks}
-              users={users}
-              currentUser={currentUser}
-              onCreateTask={createTask}
-              onUpdateTask={updateTask}
-              onDeleteTask={deleteTask}
-              onAddComment={addComment}
-              onSetVisibility={setTaskVisibility}
-            />
-          </div>
-          ) : (
-            <Navigate to="/login" replace />
-          )
-        } />
-
-        <Route path="/app" element={
-          currentUser ? (
-          <div className="container mx-auto px-4 py-6 max-w-4xl">
-            <header className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-6">
-                <h1 className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
-                  Task Manager
-                </h1>
-
-                {/* Stats badges */}
                 <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-                    <Users size={14} className="text-gray-500 dark:text-gray-400" />
-                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{onlineUsers.length}</span>
-                  </div>
-
-                  <div className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-                    <div className="flex items-center gap-1" title="To Do">
-                      <div className="w-2 h-2 rounded-full bg-gray-400"></div>
-                      <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{taskCounts.todo}</span>
-                    </div>
-                    <div className="w-px h-3 bg-gray-300 dark:bg-gray-600"></div>
-                    <div className="flex items-center gap-1" title="Doing">
-                      <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                      <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{taskCounts.doing}</span>
-                    </div>
-                    <div className="w-px h-3 bg-gray-300 dark:bg-gray-600"></div>
-                    <div className="flex items-center gap-1" title="Done">
-                      <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                      <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{taskCounts.done}</span>
-                    </div>
-                  </div>
+                  <ThemeSwitcher />
+                  <LanguageSwitcher />
+                  <UserProfile user={currentUser} onUpdate={(updated) => setCurrentUser({ ...currentUser, ...updated })} />
                 </div>
-              </div>
+              </header>
 
-              <div className="flex items-center gap-2">
-                <Link to="/kanban" className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700" title="Vue Kanban">
-                  <LayoutGrid size={20} className="text-gray-600 dark:text-gray-400" />
-                </Link>
-
-                <button onClick={() => setShowImport(true)} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700" title="Importer des tâches">
-                  <Upload size={20} className="text-gray-600 dark:text-gray-400" />
-                </button>
-
-                <ThemeSwitcher />
-                <LanguageSwitcher />
-
-                <button onClick={() => setShowCalendarModal(true)} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700" title="Calendar">
-                  <Calendar size={20} className="text-gray-600 dark:text-gray-400" />
-                </button>
-
-                <button onClick={() => setShowIntegrations(true)} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700" title="Integrations">
-                  <Settings size={20} className="text-gray-600 dark:text-gray-400" />
-                </button>
-
-                <UserProfile user={currentUser} onUpdate={(updated) => setCurrentUser({...currentUser, ...updated})} />
-              </div>
-            </header>
-
-            <div className="mb-6 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="font-medium text-gray-900 dark:text-white">
-                  Logged in as:
-                </span>
-                <span className="font-semibold text-blue-600 dark:text-blue-400">
-                  {currentUser.avatar} {currentUser.name}
-                </span>
-              </div>
-              
-              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                <span>Online users:</span>
-                <div className="flex gap-1">
-                  {onlineUsers.map(user => (
-                    <span key={user.id} className="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full text-xs">
-                      {user.avatar} {user.name}
-                    </span>
-                  ))}
-                </div>
-              </div>
+              <KanbanBoard
+                tasks={tasks}
+                users={users}
+                currentUser={currentUser}
+                onCreateTask={createTask}
+                onUpdateTask={updateTask}
+                onDeleteTask={deleteTask}
+                onAddComment={addComment}
+                onSetVisibility={setTaskVisibility}
+              />
             </div>
-
-            <TaskList
-              tasks={tasks}
-              users={users}
-              currentUser={currentUser}
-              onCreateTask={createTask}
-              onUpdateTask={updateTask}
-              onDeleteTask={deleteTask}
-              onAddComment={addComment}
-              onSetVisibility={setTaskVisibility}
-            />
-          </div>
           ) : (
             <Navigate to="/login" replace />
           )
         } />
 
-        {/* Public login route: redirect to /app if already authenticated */}
+        {/* Public login route: redirect to /modern if already authenticated */}
         <Route path="/login" element={
           currentUser ? (
-            <Navigate to="/app" replace />
+            <Navigate to="/modern" replace />
           ) : (
             <LoginPage onLogin={handleLogin} />
           )
         } />
-      </Routes>
+      </Routes >
 
       {showUserManagement && (
         <UserManagement
@@ -353,49 +332,59 @@ function App() {
         />
       )}
 
-      {showCalendarModal && currentUser && (
-        <CalendarSubscription
-          userId={currentUser.id}
-          userName={currentUser.name}
-          onClose={() => setShowCalendarModal(false)}
-        />
-      )}
+      {
+        showCalendarModal && currentUser && (
+          <CalendarSubscription
+            userId={currentUser.id}
+            userName={currentUser.name}
+            onClose={() => setShowCalendarModal(false)}
+          />
+        )
+      }
 
-      {showAdminPanel && currentUser?.isAdmin && (
-        <AdminPanel
-          currentUser={currentUser}
-          onClose={() => setShowAdminPanel(false)}
-        />
-      )}
+      {
+        showAdminPanel && currentUser?.isAdmin && (
+          <AdminPanel
+            currentUser={currentUser}
+            onClose={() => setShowAdminPanel(false)}
+          />
+        )
+      }
 
-      {showUserSettings && currentUser && (
-        <UserSettings
-          user={currentUser}
-          onClose={() => setShowUserSettings(false)}
-          onUpdate={(updatedUser) => {
-            setCurrentUser({ ...currentUser, ...updatedUser })
-          }}
-        />
-      )}
+      {
+        showUserSettings && currentUser && (
+          <UserSettings
+            user={currentUser}
+            onClose={() => setShowUserSettings(false)}
+            onUpdate={(updatedUser) => {
+              setCurrentUser({ ...currentUser, ...updatedUser })
+            }}
+          />
+        )
+      }
 
-      {showIntegrations && currentUser && (
-        <IntegrationsSettings
-          userId={currentUser.id}
-          onClose={() => setShowIntegrations(false)}
-        />
-      )}
+      {
+        showIntegrations && currentUser && (
+          <IntegrationsSettings
+            userId={currentUser.id}
+            onClose={() => setShowIntegrations(false)}
+          />
+        )
+      }
 
-      {showImport && currentUser && (
-        <TaskImport
-          currentUser={currentUser}
-          onImport={() => {
-            setShowImport(false)
-            // Tasks will auto-refresh via socket
-          }}
-          onClose={() => setShowImport(false)}
-        />
-      )}
-    </div>
+      {
+        showImport && currentUser && (
+          <TaskImport
+            currentUser={currentUser}
+            onImport={() => {
+              setShowImport(false)
+              // Tasks will auto-refresh via socket
+            }}
+            onClose={() => setShowImport(false)}
+          />
+        )
+      }
+    </div >
   )
 }
 

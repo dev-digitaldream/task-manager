@@ -24,8 +24,13 @@ enum ClientApproval {
 model Task {
   id          String    @id @default(cuid())
   title       String
+  description String?
   status      String    @default("todo") // todo, doing, done
+  startDate   DateTime?
   dueDate     DateTime?
+  color       String?   // Couleur hex (#FF5733)
+  icon        String?   // Nom de l'icône Material (work, home, star, etc.)
+  
   // Task can be assigned to someone (executor)
   assigneeId  String?
   assignee    User?     @relation("AssignedTasks", fields: [assigneeId], references: [id])
@@ -73,6 +78,8 @@ model User {
   comments Comment[]
   auditLogs AuditLog[]
   attachments Attachment[]
+  expenses Expense[]
+  quickTodos QuickTodo[]
 }
 
 model Comment {
@@ -109,5 +116,28 @@ model AuditLog {
   field     String?  // Field that changed (e.g., "status", "assignee")
   oldValue  String?  // Previous value
   newValue  String?  // New value
+  createdAt DateTime @default(now())
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  description String
+  amount      Float
+  date        DateTime @default(now())
+  status      String   @default("pending") // pending, reimbursed
+  category    String   @default("other") // transport, food, equipment, other
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  receiptUrl  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model QuickTodo {
+  id        String   @id @default(cuid())
+  content   String
+  completed Boolean  @default(false)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 }

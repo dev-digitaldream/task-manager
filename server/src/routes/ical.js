@@ -49,15 +49,31 @@ router.get('/users/:userId/tasks.ics', async (req, res) => {
       }
     });
 
-    // Add tasks as VTODO items
+    // Determine format (event or todo) - Default to event for broader compatibility
+    const format = req.query.format === 'todo' ? 'todo' : 'event';
+
     tasks.forEach(task => {
-      const todo = calendar.createEvent({
+      let item;
+      
+      const commonProps = {
         uid: `task-${task.id}@task-manager.digitaldream.work`,
         summary: task.title,
-        start: task.dueDate ? new Date(task.dueDate) : new Date(task.createdAt),
         created: new Date(task.createdAt),
         lastModified: new Date(task.updatedAt)
-      });
+      };
+
+      if (format === 'todo') {
+        item = calendar.createTodo({
+          ...commonProps
+        });
+        if (task.dueDate) item.due(new Date(task.dueDate));
+      } else {
+        item = calendar.createEvent({
+          ...commonProps,
+          start: task.dueDate ? new Date(task.dueDate) : new Date(task.createdAt),
+          allDay: true // Tasks are usually per-day
+        });
+      }
 
       // Set description with details
       const details = [];
@@ -75,11 +91,11 @@ router.get('/users/:userId/tasks.ics', async (req, res) => {
       if (task.approvalComment) {
         details.push(`Commentaire: ${task.approvalComment}`);
       }
-
-      todo.description(details.join('\n'));
+      
+      item.description(details.join('\n'));
 
       // Set category based on status
-      todo.categories([{
+      item.categories([{
         name: task.status === 'todo' ? 'À faire' : task.status === 'doing' ? 'En cours' : 'Terminé'
       }]);
 
@@ -90,18 +106,20 @@ router.get('/users/:userId/tasks.ics', async (req, res) => {
         medium: 5,
         low: 9
       };
-      todo.priority(priorityMap[task.priority] || 5);
+      item.priority(priorityMap[task.priority] || 5);
 
-      // Mark as completed if done
-      if (task.status === 'done') {
-        todo.status('COMPLETED');
-        todo.completed(new Date(task.updatedAt));
-      } else {
-        todo.status('NEEDS-ACTION');
+      // Handle status
+      if (format === 'todo') {
+        if (task.status === 'done') {
+          item.status('COMPLETED');
+          item.completed(new Date(task.updatedAt));
+        } else {
+          item.status('NEEDS-ACTION');
+        }
       }
 
       // Add URL to task
-      todo.url(`https://task-manager.digitaldream.work/app#task-${task.id}`);
+      item.url(`https://task-manager.digitaldream.work/app#task-${task.id}`);
     });
 
     // Set headers for iCalendar response

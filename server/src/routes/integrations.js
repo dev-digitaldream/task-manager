@@ -17,7 +17,7 @@ router.get('/', async (req, res) => {
     }
 
     const userConfigs = integrationConfigs.get(userId) || {}
-    
+
     // Return configs without sensitive data
     const safeConfigs = Object.entries(userConfigs).reduce((acc, [key, config]) => {
       acc[key] = {
@@ -63,8 +63,8 @@ router.post('/configure', async (req, res) => {
     }
     integrationConfigs.get(userId)[provider] = config
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: `${provider} integration configured`,
       config: {
         provider: config.provider,
@@ -106,9 +106,9 @@ router.post('/test', async (req, res) => {
     res.json({ success: true, result })
   } catch (error) {
     console.error('Integration test failed:', error)
-    res.status(500).json({ 
-      success: false, 
-      error: error.message || 'Connection test failed' 
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Connection test failed'
     })
   }
 })
@@ -207,4 +207,60 @@ router.delete('/:provider', async (req, res) => {
   }
 })
 
-module.exports = router
+/**
+ * GET /api/integrations/outlook/manifest
+ * Serve Outlook Add-in Manifest
+ */
+router.get('/outlook/manifest', (req, res) => {
+  const host = req.get('host');
+  const protocol = req.protocol === 'https' ? 'https' : 'http';
+  const baseUrl = `${protocol}://${host}`;
+
+  const manifest = `<?xml version="1.0" encoding="UTF-8"?>
+<OfficeApp
+          xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
+          xmlns:mailappor="http://schemas.microsoft.com/office/mailappversionoverrides"
+          xsi:type="MailApp">
+  <Id>c3d8f2a1-9b4e-4c7d-8e1f-2a3b4c5d6e7f</Id>
+  <Version>1.0.0.0</Version>
+  <ProviderName>Digital Dream</ProviderName>
+  <DefaultLocale>fr-FR</DefaultLocale>
+  <DisplayName DefaultValue="FlowSpace Task Manager" />
+  <Description DefaultValue="Transformez vos emails en tâches FlowSpace directement depuis Outlook." />
+  <IconUrl DefaultValue="${baseUrl}/icon.png" />
+  <HighResolutionIconUrl DefaultValue="${baseUrl}/icon.png" />
+  <SupportUrl DefaultValue="${baseUrl}/support" />
+  <AppDomains>
+    <AppDomain>${baseUrl}</AppDomain>
+  </AppDomains>
+  <Hosts>
+    <Host Name="Mailbox" />
+  </Hosts>
+  <Requirements>
+    <Sets>
+      <Set Name="Mailbox" MinVersion="1.1" />
+    </Sets>
+  </Requirements>
+  <FormSettings>
+    <Form xsi:type="ItemRead">
+      <DesktopSettings>
+        <SourceLocation DefaultValue="${baseUrl}/outlook-addin.html" />
+        <RequestedHeight>250</RequestedHeight>
+      </DesktopSettings>
+    </Form>
+  </FormSettings>
+  <Permissions>ReadWriteItem</Permissions>
+  <Rule xsi:type="RuleCollection" Mode="Or">
+    <Rule xsi:type="ItemIs" ItemType="Message" FormType="Read" />
+  </Rule>
+  <DisableEntityHighlighting>false</DisableEntityHighlighting>
+</OfficeApp>`;
+
+  res.setHeader('Content-Type', 'application/xml');
+  res.setHeader('Content-Disposition', 'attachment; filename="manifest.xml"');
+  res.send(manifest);
+});
+
+module.exports = router;

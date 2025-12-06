@@ -1,12 +1,12 @@
 {
-  "name": "Todo Collaboratif",
-  "short_name": "Todo",
-  "description": "Application collaborative de gestion de tâches en temps réel",
-  "start_url": "/app",
+  "name": "FlowSpace - ERP Personnel",
+  "short_name": "FlowSpace",
+  "description": "Votre espace de travail personnel et professionnel - Tâches, Notes de frais, Documents",
+  "start_url": "/modern",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#0f172a",
-  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#4F46E5",
+  "orientation": "any",
   "icons": [
     {
       "src": "/icon-192.png",
@@ -21,22 +21,48 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["productivity", "business"],
+  "categories": [
+    "productivity",
+    "business",
+    "finance"
+  ],
   "screenshots": [],
   "shortcuts": [
     {
-      "name": "Nouvelle tâche",
-      "short_name": "Nouvelle",
+      "name": "Nouvelle Tâche",
+      "short_name": "Tâche",
       "description": "Créer une nouvelle tâche",
-      "url": "/app?action=new",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+      "url": "/modern?action=new",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
-      "name": "Dashboard",
-      "short_name": "Dashboard",
-      "description": "Vue d'ensemble publique",
-      "url": "/dashboard",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+      "name": "Notes de Frais",
+      "short_name": "Dépenses",
+      "description": "Gérer mes notes de frais",
+      "url": "/expenses",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Mes Pages",
+      "short_name": "Pages",
+      "description": "Accéder à mes documents",
+      "url": "/my-pages",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }

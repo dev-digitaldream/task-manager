@@ -37,11 +37,11 @@ const helmetConfig = helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://appsforoffice.microsoft.com"], // Required for Vite dev + Office.js
       imgSrc: ["'self'", "data:", "https:", "blob:"],
       connectSrc: ["'self'", "wss:", "ws:", "https://outlook.office.com", "https://outlook.office365.com"],
-      fontSrc: ["'self'", "data:"],
+      fontSrc: ["'self'", "data:", "https://fonts.gstatic.com"],
       objectSrc: ["'none'"],
       mediaSrc: ["'self'"],
       frameSrc: ["'self'", "https://outlook.office.com", "https://outlook.office365.com", "https://outlook.live.com"],
@@ -77,8 +77,13 @@ const getCorsOptions = () => {
 
   return {
     origin: (origin, callback) => {
-      // Allow requests with no origin (mobile apps, Postman, etc.)
+      // Allow requests with no origin (mobile apps, Postman, curl, same-origin, etc.)
       if (!origin) return callback(null, true);
+
+      // Allow same-origin requests (when the page is served from the same domain)
+      if (origin.includes('digitaldream.work')) {
+        return callback(null, true);
+      }
 
       if (allowedOrigins.includes(origin) || process.env.NODE_ENV === 'development') {
         callback(null, true);

@@ -4,7 +4,7 @@ set -e
 cd /app/server
 
 # Initialize database if not exists
-if [ ! -f /app/data/dev.db ]; then
+if [ ! -f /app/data/prod.db ]; then
     echo "🗄️  Creating new database..."
     npx prisma db push
     echo "🌱 Seeding demo data..."
@@ -12,7 +12,7 @@ if [ ! -f /app/data/dev.db ]; then
 else
     echo "✅ Database exists"
     # Check if database is empty (no users)
-    USER_COUNT=$(echo "SELECT COUNT(*) FROM User;" | sqlite3 /app/data/dev.db 2>/dev/null || echo "0")
+    USER_COUNT=$(echo "SELECT COUNT(*) FROM User;" | sqlite3 /app/data/prod.db 2>/dev/null || echo "0")
     if [ "$USER_COUNT" = "0" ]; then
         echo "🌱 Database empty, seeding demo data..."
         node src/seed-demo.js
@@ -24,3 +24,4 @@ fi
 # Start the application
 echo "🚀 Starting application..."
 exec node src/server.js
+

@@ -14,10 +14,15 @@ async function main() {
   console.log('🌱 Seeding demo data...');
 
   // Clean existing data
+  // Delete in correct order to respect Foreign Keys
+  await prisma.page.deleteMany();
   await prisma.auditLog.deleteMany();
   await prisma.attachment.deleteMany();
   await prisma.comment.deleteMany();
   await prisma.task.deleteMany();
+  await prisma.workspaceInvitation.deleteMany(); // If exists
+  await prisma.workspaceMember.deleteMany();
+  await prisma.workspace.deleteMany();
   await prisma.user.deleteMany();
 
   // Create demo users with credentials

@@ -1,0 +1,5 @@
+Script started on Sat Dec  6 18:26:22 2025
+[1m[7m%[27m[1m[0m                                                                             [0m[27m[24m[Jmohammed@mohammeds-MacBook-Pro kanban % [K[?2004h[?2004l
+[1m[7m%[27m[1m[0m                                                                             [0m[27m[24m[Jmohammed@mohammeds-MacBook-Pro kanban % [K[?2004hssshpass -p 'ZYzK^KawP&gk7B8m$4ifdP7^2 [K'' ssh -o StrictHostKeyChecking=no root@191.96.11.125 "cat /opt/supabase/backu [Kpp.sh && echo '---' && ls -la /opt/supabase/"[?2004l
+cat: /opt/supabase/backup.sh: No such file or directory
+[1m[7m%[27m[1m[0m                                                                             [0m[27m[24m[Jmohammed@mohammeds-MacBook-Pro kanban % [K[?2004h

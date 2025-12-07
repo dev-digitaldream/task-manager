@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
-export const useQuickTodos = (currentUser) => {
+export const useQuickTodos = (currentUser, workspaceId) => {
     const [todos, setTodos] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -10,7 +10,10 @@ export const useQuickTodos = (currentUser) => {
         if (!currentUser?.id) return;
 
         try {
-            const res = await fetch(`${API_URL}/todos?userId=${currentUser.id}`);
+            let url = `${API_URL}/todos?userId=${currentUser.id}`;
+            if (workspaceId) url += `&workspaceId=${workspaceId}`;
+            
+            const res = await fetch(url);
             if (res.ok) {
                 const data = await res.json();
                 setTodos(data);
@@ -20,14 +23,17 @@ export const useQuickTodos = (currentUser) => {
         } finally {
             setLoading(false);
         }
-    }, [currentUser?.id]);
+    }, [currentUser?.id, workspaceId]);
 
     const addTodo = async (content) => {
         try {
+            const body = { content, userId: currentUser.id };
+            if (workspaceId) body.workspaceId = workspaceId;
+
             const res = await fetch(`${API_URL}/todos`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ content, userId: currentUser.id })
+                body: JSON.stringify(body)
             });
             if (res.ok) {
                 const newTodo = await res.json();

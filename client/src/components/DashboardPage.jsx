@@ -16,6 +16,15 @@ const DashboardPage = ({ currentUser }) => {
     const { users, onlineUsers } = useUsers(socket);
     const [timeRange, setTimeRange] = useState('week'); // week, month, year
 
+    const darkMode = document.documentElement.classList.contains('dark');
+    const theme = {
+        bg: darkMode ? 'bg-[#0d1117]' : 'bg-slate-50',
+        card: darkMode ? 'bg-[#21262d]' : 'bg-white',
+        cardBorder: darkMode ? 'border-gray-700' : 'border-slate-200',
+        text: darkMode ? 'text-gray-100' : 'text-slate-900',
+        textMuted: darkMode ? 'text-gray-400' : 'text-slate-500',
+    };
+
     // Calculs des statistiques
     const stats = useMemo(() => {
         const now = new Date();
@@ -122,9 +131,9 @@ const DashboardPage = ({ currentUser }) => {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 pb-20 md:pb-0">
+        <div className={`min-h-screen ${theme.bg} pb-20 md:pb-0`}>
             {/* Header */}
-            <div className="bg-white border-b border-slate-200">
+            <div className={`${theme.card} border-b ${theme.cardBorder}`}>
                 <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-6">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">

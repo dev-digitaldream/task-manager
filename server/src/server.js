@@ -99,6 +99,9 @@ app.use('/api/integrations', require('./routes/integrations'));
 app.use('/api', require('./routes/ical'));
 app.use('/api/expenses', require('./routes/expenses'));
 app.use('/api/todos', require('./routes/todos'));
+app.use('/api/workspaces', require('./routes/workspaces'));
+app.use('/api/tasks', require('./routes/subtasks'));
+app.use('/api/pages', require('./routes/pages'));
 
 // Health check
 app.get('/health', (req, res) => {

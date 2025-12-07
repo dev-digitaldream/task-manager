@@ -9,7 +9,16 @@ const prisma = new PrismaClient();
 // GET /api/tasks
 router.get('/', async (req, res) => {
   try {
+    const { workspaceId, assigneeId, ownerId } = req.query; // Add query params destructuring
+
+    const where = {};
+    if (workspaceId) where.workspaceId = workspaceId;
+    // Optional: add other filters if needed by frontend, though usually frontend does it or we use specific endpoints
+    if (assigneeId) where.assigneeId = assigneeId;
+    if (ownerId) where.ownerId = ownerId;
+
     const tasks = await prisma.task.findMany({
+      where, // Apply filter
       include: {
         assignee: {
           select: { id: true, name: true, avatar: true }
@@ -24,6 +33,9 @@ router.get('/', async (req, res) => {
             }
           },
           orderBy: { createdAt: 'asc' }
+        },
+        subtasks: {
+          orderBy: { order: 'asc' }
         }
       },
       orderBy: [
@@ -43,7 +55,7 @@ router.get('/', async (req, res) => {
 // POST /api/tasks
 router.post('/', async (req, res) => {
   try {
-    const { title, assigneeId, ownerId, dueDate, priority, clientApproval, approvalComment, isPublic, publicSummary, isRecurring, recurrencePattern } = req.body;
+    const { title, assigneeId, ownerId, dueDate, priority, clientApproval, approvalComment, isPublic, publicSummary, isRecurring, recurrencePattern, workspaceId } = req.body;
 
     if (!title?.trim()) {
       return res.status(400).json({ error: 'Title is required' });
@@ -61,6 +73,7 @@ router.post('/', async (req, res) => {
         title: title.trim(),
         assigneeId: assigneeId || null,
         ownerId: ownerId || assigneeId || null,
+        workspaceId, // Save workspaceId
         dueDate: dueDate ? new Date(dueDate) : null,
         // Optional new fields fall back to schema defaults if undefined
         priority: priority || undefined,

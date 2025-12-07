@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from 'react'
 
-export function useTasks(socket) {
+export function useTasks(socket, workspaceId) {
   const [tasks, setTasks] = useState([])
 
   const fetchTasks = useCallback(async () => {
     try {
-      const response = await fetch('/api/tasks')
+      const url = workspaceId ? `/api/tasks?workspaceId=${workspaceId}` : '/api/tasks'
+      const response = await fetch(url)
       if (response.ok) {
         const data = await response.json()
         setTasks(data)
@@ -13,7 +14,7 @@ export function useTasks(socket) {
     } catch (error) {
       console.error('Failed to fetch tasks:', error)
     }
-  }, [])
+  }, [workspaceId])
 
   useEffect(() => {
     fetchTasks()
@@ -23,10 +24,13 @@ export function useTasks(socket) {
     if (!socket) return
 
     const handleTaskCreated = (task) => {
+      // Filter out tasks from other workspaces only if we are in specific workspace view
+      if (workspaceId && task.workspaceId && task.workspaceId !== workspaceId) return;
       setTasks(prev => [task, ...prev])
     }
 
     const handleTaskUpdated = (updatedTask) => {
+        // Filter logic could be more complex, but generally update if ID matches
       setTasks(prev => 
         prev.map(task => 
           task.id === updatedTask.id ? updatedTask : task
@@ -47,16 +51,19 @@ export function useTasks(socket) {
       socket.off('task:updated', handleTaskUpdated)
       socket.off('task:deleted', handleTaskDeleted)
     }
-  }, [socket])
+  }, [socket, workspaceId])
 
   const createTask = async (taskData) => {
     try {
+      const payload = { ...taskData };
+      if (workspaceId) payload.workspaceId = workspaceId;
+
       const response = await fetch('/api/tasks', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(taskData),
+        body: JSON.stringify(payload),
       })
       
       if (!response.ok) {

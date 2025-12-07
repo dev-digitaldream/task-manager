@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -31,6 +31,10 @@ model Task {
   color       String?   // Couleur hex (#FF5733)
   icon        String?   // Nom de l'icône Material (work, home, star, etc.)
   
+  // Workspace (multi-tenant)
+  workspaceId String?
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  
   // Task can be assigned to someone (executor)
   assigneeId  String?
   assignee    User?     @relation("AssignedTasks", fields: [assigneeId], references: [id])
@@ -53,11 +57,24 @@ model Task {
   comments    Comment[]
   auditLogs   AuditLog[]
   attachments Attachment[]
+  subtasks    Subtask[]
   priority    Priority  @default(medium)
   clientApproval ClientApproval @default(none)
   approvalComment String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+}
+
+// Subtasks/Checklist items within a task
+model Subtask {
+  id          String   @id @default(cuid())
+  content     String
+  completed   Boolean  @default(false)
+  order       Int      @default(0)
+  taskId      String
+  task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model User {
@@ -67,19 +84,115 @@ model User {
   avatar   String?
   isOnline Boolean   @default(false)
   isAdmin  Boolean   @default(false)
-  email    String?
+  email    String?   @unique
+  
+  // Email verification
+  emailVerified    Boolean   @default(false)
+  emailVerifyToken String?
+  emailVerifyExpiry DateTime?
+  
+  // Password reset
+  resetToken       String?
+  resetTokenExpiry DateTime?
+  
+  // Two-Factor Authentication
+  twoFactorEnabled Boolean   @default(false)
+  twoFactorSecret  String?
+  backupCodes      String?   // JSON array of backup codes
+  
+  // Notification preferences
   notifyOnAssign   Boolean @default(true)
   notifyOnComplete Boolean @default(true)
   notifyOnComment  Boolean @default(true)
-  // Tasks this user owns (personal list)
-  ownedTasks    Task[]   @relation("OwnedTasks")
-  // Tasks assigned to this user (executor)
-  assignedTasks Task[]   @relation("AssignedTasks")
-  comments Comment[]
-  auditLogs AuditLog[]
-  attachments Attachment[]
-  expenses Expense[]
-  quickTodos QuickTodo[]
+  
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  
+  // Relations
+  ownedTasks    Task[]     @relation("OwnedTasks")
+  assignedTasks Task[]     @relation("AssignedTasks")
+  comments      Comment[]
+  auditLogs     AuditLog[]
+  attachments   Attachment[]
+  expenses      Expense[]
+  quickTodos    QuickTodo[]
+  sessions      Session[]
+  
+  // Workspace relations
+  workspaces      WorkspaceMember[]
+  ownedWorkspaces Workspace[]
+  pages           Page[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  userAgent String?
+  ipAddress String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+// ========================================
+// MULTI-TENANT: WORKSPACE MODELS
+// ========================================
+
+model Workspace {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique  // URL-friendly name (e.g., "acme-corp")
+  description String?
+  logo        String?
+  
+  // Owner
+  ownerId     String
+  owner       User     @relation(fields: [ownerId], references: [id])
+  
+  // Settings
+  isPublic    Boolean  @default(false)
+  currency    String   @default("EUR") // EUR, USD, GBP, etc.
+  
+  // Relations
+  members     WorkspaceMember[]
+  invitations WorkspaceInvitation[]
+  tasks       Task[]
+  quickTodos  QuickTodo[]
+  expenses    Expense[]
+  pages       Page[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+}
+
+model WorkspaceMember {
+  id          String   @id @default(cuid())
+  userId      String
+  workspaceId String
+  role        String   @default("member") // owner, admin, member
+  
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  
+  joinedAt    DateTime @default(now())
+  
+  @@unique([userId, workspaceId])
+}
+
+model WorkspaceInvitation {
+  id          String   @id @default(cuid())
+  email       String
+  workspaceId String
+  role        String   @default("member")
+  token       String   @unique
+  
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  
+  invitedBy   String?
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
 }
 
 model Comment {
@@ -127,17 +240,37 @@ model Expense {
   status      String   @default("pending") // pending, reimbursed
   category    String   @default("other") // transport, food, equipment, other
   userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspaceId String?
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   receiptUrl  String?
-  createdAt   DateTime @default(now())
+  createdAt   DateTime   @default(now())
   updatedAt   DateTime @updatedAt
 }
 
 model QuickTodo {
-  id        String   @id @default(cuid())
-  content   String
-  completed Boolean  @default(false)
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
+  id          String     @id @default(cuid())
+  content     String
+  completed   Boolean    @default(false)
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspaceId String?
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdAt   DateTime   @default(now())
+}
+
+model Page {
+  id          String     @id @default(cuid())
+  title       String
+  content     String     @db.Text
+  isPublic    Boolean    @default(false)
+  
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  workspaceId String?
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 }

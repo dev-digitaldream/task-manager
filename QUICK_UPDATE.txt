@@ -1,0 +1,65 @@
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                    FLOWSPACES - QUICK UPDATE (2 STEPS)                   ║
+║                                                                           ║
+║  Your app is already on Dokploy at 85.121.48.53                          ║
+║  Just need to update to latest version                                   ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+⚡ STEP 1: PUSH CODE TO GITHUB
+═══════════════════════════════════════════════════════════════════════════
+
+On your machine:
+
+cd /Volumes/ExtremeSSD/projetcs/kanban
+
+git status                # Check status
+git add -A                # Add all changes
+git commit -m "🚀 Update: Latest version"  # Commit
+git push origin main      # Push
+
+
+⚡ STEP 2: REDEPLOY VIA DOKPLOY
+═══════════════════════════════════════════════════════════════════════════
+
+1. Open: http://85.121.48.53:3000
+
+2. Go to: Projects → FlowSpaces → flowspaces-app
+
+3. Click: "Redeploy" button
+
+4. Wait: 5-10 minutes (watch logs)
+
+5. Success: See "✅ Deployment successful"
+
+
+✅ VERIFY
+═══════════════════════════════════════════════════════════════════════════
+
+Test health:
+  curl https://www.flowspaces.work/health
+
+Check monitoring:
+  http://85.121.48.53:3002  (Uptime Kuma)
+
+Done! 🎉
+
+
+❓ ISSUES?
+═══════════════════════════════════════════════════════════════════════════
+
+Read: DOKPLOY_SIMPLE_UPDATE.md (troubleshooting section)
+
+Or check logs:
+  ssh root@85.121.48.53
+  docker logs -f flowspaces
+
+
+🔗 LINKS
+═══════════════════════════════════════════════════════════════════════════
+
+App:      https://www.flowspaces.work
+Dokploy:  http://85.121.48.53:3000
+Kuma:     http://85.121.48.53:3002
+Health:   https://www.flowspaces.work/health
+
+═══════════════════════════════════════════════════════════════════════════

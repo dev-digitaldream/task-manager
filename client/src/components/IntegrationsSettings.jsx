@@ -73,16 +73,19 @@ const IntegrationsSettings = ({ userId, onIntegrationChange }) => {
   const fetchIntegrations = async () => {
     try {
       setLoading(true)
+      console.log('Fetching integrations for user:', userId)
       const response = await fetch(`/api/integrations?userId=${userId}`)
+      console.log('Fetch integrations response:', response.status)
       if (response.ok) {
         const data = await response.json()
         setIntegrations(data)
       } else {
-        setError(t('errors.generic'))
+        console.error('Error fetching integrations:', response.statusText)
+        setError(t ? t('errors.generic') : 'Error loading data')
       }
     } catch (err) {
       console.error('Failed to fetch integrations:', err)
-      setError(t('errors.networkError'))
+      setError(t ? t('errors.networkError') : 'Network error')
     } finally {
       setLoading(false)
     }
@@ -252,6 +255,7 @@ const IntegrationsSettings = ({ userId, onIntegrationChange }) => {
   }
 
   const getIntegrationForProvider = (provider) => {
+    if (!Array.isArray(integrations)) return null
     return integrations.find(i => i.provider === provider)
   }
 

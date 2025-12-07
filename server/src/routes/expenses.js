@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 // GET /api/expenses
 router.get('/', async (req, res) => {
     try {
-        const { userId, status } = req.query;
+        const { userId, status, workspaceId } = req.query;
 
         if (!userId) {
             return res.status(400).json({ error: 'UserId is required' });
@@ -14,6 +14,7 @@ router.get('/', async (req, res) => {
 
         const where = { userId };
         if (status) where.status = status;
+        if (workspaceId) where.workspaceId = workspaceId;
 
         const expenses = await prisma.expense.findMany({
             where,
@@ -30,19 +31,22 @@ router.get('/', async (req, res) => {
 // GET /api/expenses/stats
 router.get('/stats', async (req, res) => {
     try {
-        const { userId } = req.query;
+        const { userId, workspaceId } = req.query;
 
         if (!userId) {
             return res.status(400).json({ error: 'UserId is required' });
         }
 
+        const where = { userId };
+        if (workspaceId) where.workspaceId = workspaceId;
+
         const pending = await prisma.expense.aggregate({
-            where: { userId, status: 'pending' },
+            where: { ...where, status: 'pending' },
             _sum: { amount: true }
         });
 
         const reimbursed = await prisma.expense.aggregate({
-            where: { userId, status: 'reimbursed' },
+            where: { ...where, status: 'reimbursed' },
             _sum: { amount: true }
         });
 
@@ -60,7 +64,7 @@ router.get('/stats', async (req, res) => {
 // POST /api/expenses
 router.post('/', async (req, res) => {
     try {
-        const { description, amount, category, date, userId } = req.body;
+        const { description, amount, category, date, userId, workspaceId } = req.body;
 
         if (!description || !amount || !userId) {
             return res.status(400).json({ error: 'Description, amount and userId are required' });
@@ -73,6 +77,7 @@ router.post('/', async (req, res) => {
                 category: category || 'other',
                 date: date ? new Date(date) : new Date(),
                 userId,
+                workspaceId, // Optional
                 status: 'pending'
             }
         });
